@@ -1,8 +1,11 @@
+from pathlib import Path
 from typing_extensions import TypedDict
 from langgraph.graph import StateGraph, START, END
 from IPython.display import Image, display
 from langchain_openai import ChatOpenAI
 import os
+
+IMG_DIR = Path(__file__).resolve().parent / "img"
 
 llm = ChatOpenAI(
     model="qwen-max",
@@ -71,9 +74,12 @@ parallel_builder.add_edge("call_llm_3", "aggregator")
 parallel_builder.add_edge("aggregator", END)
 parallel_workflow = parallel_builder.compile()
 
-# Show workflow
-parallel_workflow.get_graph().draw_mermaid_png().save("graph.png")
-print("Graph saved to graph.png")
+# Show workflow（draw_mermaid_png() 返回 bytes，需写入文件）
+IMG_DIR.mkdir(parents=True, exist_ok=True)
+graph_path = IMG_DIR / "02_parallelization_graph.png"
+with open(graph_path, "wb") as f:
+    f.write(parallel_workflow.get_graph().draw_mermaid_png())
+print(f"Graph saved to {graph_path}")
 
 # Invoke
 state = parallel_workflow.invoke({"topic": "cats"})
