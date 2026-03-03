@@ -1,5 +1,18 @@
-from typing_extensions import Literal
+from typing_extensions import Literal, TypedDict
 from langchain.messages import HumanMessage, SystemMessage
+from pydantic import BaseModel, Field
+from langchain_openai import ChatOpenAI
+import os
+from pathlib import Path
+from langgraph.graph import StateGraph, START, END
+
+IMG_DIR = Path(__file__).resolve().parent / "img"
+
+llm = ChatOpenAI(
+    model="qwen-max",
+    base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+    api_key=os.getenv("DASHSCOPE_API_KEY"),
+)
 
 
 # Schema for structured output to use as routing logic
@@ -49,7 +62,7 @@ def llm_call_router(state: State):
     decision = router.invoke(
         [
             SystemMessage(
-                content="Route the input to story, joke, or poem based on the user's request."
+                content="Route the input to story, joke, or poem based on the user's request. Reply in JSON format with a 'step' field: one of 'story', 'joke', or 'poem'."
             ),
             HumanMessage(content=state["input"]),
         ]
@@ -97,7 +110,11 @@ router_builder.add_edge("llm_call_3", END)
 router_workflow = router_builder.compile()
 
 # Show the workflow
-display(Image(router_workflow.get_graph().draw_mermaid_png()))
+IMG_DIR.mkdir(parents=True, exist_ok=True)
+graph_path = IMG_DIR / "03_routing_graph.png"
+with open(graph_path, "wb") as f:
+    f.write(router_workflow.get_graph().draw_mermaid_png())
+print(f"Graph saved to {graph_path}")
 
 # Invoke
 state = router_workflow.invoke({"input": "Write me a joke about cats"})
