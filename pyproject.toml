@@ -1,0 +1,11 @@
+[project]
+name = "rag"
+version = "0.1.0"
+description = "RE: From Zero to Agentic!!"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "graphdatascience>=1.20",
+    "neo4j-graphrag>=1.0.0,<1.13.0",
+    "numpy<2",
+]
