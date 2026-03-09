@@ -35,6 +35,7 @@ RAG/
 │   ├── VideoCut/              # 智能视频合成与防重复（LangGraph、分镜脚本、FFmpeg）
 │   ├── LongRuiGame/           # 游戏玩家智能问答（RAG + 工具调用、模糊反问、日志）
 │   ├── Obsidian/              # Obsidian 知识库（LlamaIndex + Ollama 增量索引与问答）
+│   ├── NanoBat/               # Qwen 驱动轻量助手（参考 NanoClaw，国内友好、通义 API）
 │   └── 其他示例               # weather_agent、stream_whales、quantqmt 等
 ├── Archive/                   # 历史代码归档
 └── Data/                      # 测试数据（JSON、TXT）
@@ -82,26 +83,31 @@ Agno 框架入门与助手型 Agent：Get_Started（HelloAgno、Learning、SQLit
 
 ### 8. Experiment（实验与场景）
 
-| 子目录/文件 | 说明 |
-|-------------|------|
-| **graph-rag-agent/** | GraphRAG + DeepSearch 多 Agent 问答：知识图谱增强 RAG、多级检索、Plan-Execute-Report 多智能体、Neo4j、增量更新与评估。FastAPI + Streamlit。详见 [readme.md](Experiment/graph-rag-agent/readme.md) |
-| **CRAG/** | 纠正式 RAG：检索评估 → Correct/Incorrect/Ambiguous → 知识精炼或网络搜索。FastAPI + Streamlit，MinerU PDF。详见 [README.md](Experiment/CRAG/README.md) |
-| **VideoCut/** | 智能视频合成与防重复：LangGraph 状态图、分镜脚本（YAML）、素材库、FFmpeg、成片查重与重试。详见 [README.md](Experiment/VideoCut/README.md) |
-| **LongRuiGame/** | 游戏玩家智能问答：RAG（game_faq.json）+ 工具调用（query_item、query_event_or_skill）、模糊问题反问、问答日志。详见 [README.md](Experiment/LongRuiGame/README.md) |
-| **Obsidian/** | Obsidian 知识库：LlamaIndex + Ollama（qwen3-vl / qwen3-embedding），增量索引与本地问答。 |
-| 其他 | `weather_agent`、`stream_whales`、`quantqmt` 等示例 |
+
+| 子目录/文件               | 说明                                                                                                                                                                 |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **graph-rag-agent/** | GraphRAG + DeepSearch 多 Agent 问答：知识图谱增强 RAG、多级检索、Plan-Execute-Report 多智能体、Neo4j、增量更新与评估。FastAPI + Streamlit。详见 [readme.md](Experiment/graph-rag-agent/readme.md)   |
+| **CRAG/**            | 纠正式 RAG：检索评估 → Correct/Incorrect/Ambiguous → 知识精炼或网络搜索。FastAPI + Streamlit，MinerU PDF。详见 [README.md](Experiment/CRAG/README.md)                                    |
+| **VideoCut/**        | 智能视频合成与防重复：LangGraph 状态图、分镜脚本（YAML）、素材库、FFmpeg、成片查重与重试。详见 [README.md](Experiment/VideoCut/README.md)                                                               |
+| **LongRuiGame/**     | 游戏玩家智能问答：RAG（game_faq.json）+ 工具调用（query_item、query_event_or_skill）、模糊问题反问、问答日志。详见 [README.md](Experiment/LongRuiGame/README.md)                                    |
+| **Obsidian/**        | Obsidian 知识库：LlamaIndex + Ollama（qwen3-vl / qwen3-embedding），增量索引与本地问答。                                                                                            |
+| **NanoBat/**         | **Qwen 驱动轻量助手**：参考 [NanoClaw](https://github.com/qwibitai/nanoclaw)，通义千问 API 驱动、国内友好、单进程 CLI、可扩展技能。详见 [Experiment/NanoBat/README.md](Experiment/NanoBat/README.md) |
+| 其他                   | `weather_agent`、`stream_whales`、`quantqmt` 等示例                                                                                                                     |
+
 
 ---
 
 ## 技术栈
 
-| 类别 | 技术 |
-|------|------|
-| **框架** | LangChain、LangGraph、PydanticAI、Pydantic Graph、Agno、LlamaIndex（Obsidian） |
-| **LLM** | OpenAI、Ollama（qwen3、qwen3-embedding、qwen3-vl）、阿里云百炼、Google Gemini |
-| **向量/存储** | Chroma、pgvector、InMemoryVectorStore |
-| **Web/服务** | Streamlit、FastAPI、Gradio |
-| **其他** | MinerU（PDF）、FFmpeg（VideoCut）、Neo4j（graph-rag-agent） |
+
+| 类别         | 技术                                                                      |
+| ---------- | ----------------------------------------------------------------------- |
+| **框架**     | LangChain、LangGraph、PydanticAI、Pydantic Graph、Agno、LlamaIndex（Obsidian） |
+| **LLM**    | OpenAI、Ollama（qwen3、qwen3-embedding、qwen3-vl）、阿里云百炼、Google Gemini       |
+| **向量/存储**  | Chroma、pgvector、InMemoryVectorStore                                     |
+| **Web/服务** | Streamlit、FastAPI、Gradio                                                |
+| **其他**     | MinerU（PDF）、FFmpeg（VideoCut）、Neo4j（graph-rag-agent）                     |
+
 
 ---
 
@@ -125,12 +131,14 @@ pip install agno   # 多模态 Agent
 
 ### 环境变量
 
-| 用途 | 变量 | 说明 |
-|------|------|------|
-| 阿里云百炼 | `DASHSCOPE_API_KEY` | 通义模型 |
-| OpenAI | `OPENAI_API_KEY` | GPT 等 |
-| Ollama | 无需 Key | 本地 `http://localhost:11434`，需先 `ollama pull <model>` |
-| Gemini | 在应用内或环境变量配置 | 多模态示例 |
+
+| 用途     | 变量                  | 说明                                                   |
+| ------ | ------------------- | ---------------------------------------------------- |
+| 阿里云百炼  | `DASHSCOPE_API_KEY` | 通义模型                                                 |
+| OpenAI | `OPENAI_API_KEY`    | GPT 等                                                |
+| Ollama | 无需 Key              | 本地 `http://localhost:11434`，需先 `ollama pull <model>` |
+| Gemini | 在应用内或环境变量配置         | 多模态示例                                                |
+
 
 ### Ollama 常用模型
 
@@ -146,25 +154,28 @@ ollama pull qwen3-vl:4b           # 多模态（可选）
 
 ### 初学者
 
-1. **基础**（`LangChain_Tutorial_Fast/01-10`）：LLM、Embedding、Prompt  
-2. **进阶**（11–23）：Prompt 模板、Chain、对话历史  
-3. **RAG**（24–31）：文档加载、分块、向量检索、完整 RAG  
-4. **实战**（`LangChain_RAG_Proj`）：企业级应用与 Web 部署  
+1. **基础**（`LangChain_Tutorial_Fast/01-10`）：LLM、Embedding、Prompt
+2. **进阶**（11–23）：Prompt 模板、Chain、对话历史
+3. **RAG**（24–31）：文档加载、分块、向量检索、完整 RAG
+4. **实战**（`LangChain_RAG_Proj`）：企业级应用与 Web 部署
 
 ### 快速启动命令
 
-| 目标 | 命令 |
-|------|------|
-| 教程示例 | `cd LangChain_Tutorial_Fast && python 01_LLM.py` |
-| RAG 问答 | `cd LangChain_RAG_Proj && streamlit run app_qa.py` |
-| PydanticAI | `cd PydanticAI/00_Preparation && python HelloPydanticAI.py` |
-| PydanticGraph | `cd PydanticGraph && python vending_machine.py` |
-| graph-rag-agent | `cd Experiment/graph-rag-agent && uvicorn server.main:app --reload`，另开终端 `streamlit run frontend/app.py` |
-| CRAG | `cd Experiment/CRAG && uvicorn api:app --host 0.0.0.0 --port 8000` 或 `streamlit run app_streamlit.py` |
-| VideoCut | `cd Experiment/VideoCut && uvicorn api.main:app --reload`（需 FFmpeg） |
-| LongRuiGame 玩家问答 | `cd Experiment/LongRuiGame/scene1_player_qa && python player_qa_agent.py` |
-| Obsidian 知识库 | 修改 `Experiment/Obsidian/obsidian_loader.py` 中 vault 路径后运行，再运行 `obsidian_agent.py` 问答（需 Ollama + qwen3-vl + qwen3-embedding） |
-| Agno | `cd Agno/00_Get_Started && python 00_HelloAgno.py` |
+
+| 目标               | 命令                                                                                                                          |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| 教程示例             | `cd LangChain_Tutorial_Fast && python 01_LLM.py`                                                                            |
+| RAG 问答           | `cd LangChain_RAG_Proj && streamlit run app_qa.py`                                                                          |
+| PydanticAI       | `cd PydanticAI/00_Preparation && python HelloPydanticAI.py`                                                                 |
+| PydanticGraph    | `cd PydanticGraph && python vending_machine.py`                                                                             |
+| graph-rag-agent  | `cd Experiment/graph-rag-agent && uvicorn server.main:app --reload`，另开终端 `streamlit run frontend/app.py`                    |
+| CRAG             | `cd Experiment/CRAG && uvicorn api:app --host 0.0.0.0 --port 8000` 或 `streamlit run app_streamlit.py`                       |
+| VideoCut         | `cd Experiment/VideoCut && uvicorn api.main:app --reload`（需 FFmpeg）                                                         |
+| LongRuiGame 玩家问答 | `cd Experiment/LongRuiGame/scene1_player_qa && python player_qa_agent.py`                                                   |
+| Obsidian 知识库     | 修改 `Experiment/Obsidian/obsidian_loader.py` 中 vault 路径后运行，再运行 `obsidian_agent.py` 问答（需 Ollama + qwen3-vl + qwen3-embedding） |
+| NanoBat（Qwen 助手） | `cd Experiment/NanoBat && pip install -r requirements.txt`，配置 `.env` 中的 `DASHSCOPE_API_KEY` 后 `python main.py`              |
+| Agno             | `cd Agno/00_Get_Started && python 00_HelloAgno.py`                                                                          |
+
 
 ---
 
@@ -175,21 +186,24 @@ ollama pull qwen3-vl:4b           # 多模态（可选）
 - 从入门到生产的完整 RAG 与 Agent 学习路径  
 - 多框架：LangChain、LangGraph、PydanticAI、Pydantic Graph、Agno、LlamaIndex  
 - 多模型：OpenAI、Ollama、阿里云百炼、Gemini  
-- 图式工作流、纠正式 RAG（CRAG）、GraphRAG 多 Agent、游戏问答、Obsidian 知识库、视频合成等实验与场景  
+- 图式工作流、纠正式 RAG（CRAG）、GraphRAG 多 Agent、游戏问答、Obsidian 知识库、视频合成等实验与场景
 
 ### 文档与链接
 
-| 项目 | 文档 |
-|------|------|
-| LangChain_RAG_Proj | [README.md](LangChain_RAG_Proj/README.md) |
-| PydanticAI | [README.md](PydanticAI/README.md) |
-| graph-rag-agent | [readme.md](Experiment/graph-rag-agent/readme.md) |
-| CRAG | [README.md](Experiment/CRAG/README.md) |
-| VideoCut | [README.md](Experiment/VideoCut/README.md) |
-| LongRuiGame | [README.md](Experiment/LongRuiGame/README.md) |
-| LangChain | [python.langchain.com](https://python.langchain.com) |
-| LangGraph | [langchain-ai.github.io/langgraph](https://langchain-ai.github.io/langgraph) |
-| PydanticAI | [ai.pydantic.dev](https://ai.pydantic.dev) |
+
+| 项目                 | 文档                                                                           |
+| ------------------ | ---------------------------------------------------------------------------- |
+| LangChain_RAG_Proj | [README.md](LangChain_RAG_Proj/README.md)                                    |
+| PydanticAI         | [README.md](PydanticAI/README.md)                                            |
+| graph-rag-agent    | [readme.md](Experiment/graph-rag-agent/readme.md)                            |
+| CRAG               | [README.md](Experiment/CRAG/README.md)                                       |
+| VideoCut           | [README.md](Experiment/VideoCut/README.md)                                   |
+| LongRuiGame        | `README.md`                                                                  |
+| NanoBat            | [README.md](Experiment/NanoBat/README.md)                                    |
+| LangChain          | [python.langchain.com](https://python.langchain.com)                         |
+| LangGraph          | [langchain-ai.github.io/langgraph](https://langchain-ai.github.io/langgraph) |
+| PydanticAI         | [ai.pydantic.dev](https://ai.pydantic.dev)                                   |
+
 
 ---
 

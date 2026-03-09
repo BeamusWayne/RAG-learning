@@ -6,6 +6,9 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "graphdatascience>=1.20",
+    "llama-index>=0.14.15",
+    "llama-index-embeddings-ollama>=0.8.6",
+    "llama-index-llms-ollama>=0.9.1",
     "neo4j-graphrag>=1.0.0,<1.13.0",
     "numpy<2",
 ]
