@@ -1,0 +1,9 @@
+# NanoBat - Qwen 驱动轻量助手
+# Python 3.10+
+
+# 通义 / OpenAI 兼容
+openai>=1.0.0
+python-dotenv>=1.0.0
+
+# 可选：直接使用 DashScope SDK（与 openai 二选一即可）
+# dashscope>=1.14.0
