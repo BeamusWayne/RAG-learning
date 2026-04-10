@@ -9,14 +9,16 @@
 - [项目结构](#项目结构)
 - [核心项目](#核心项目)
   - [AgenticRAG（新）](#1-agenticrag新)
-  - [LangChain_RAG_Proj](#2-langchain_rag_proj推荐入门)
-  - [LangChain_Tutorial_Fast](#3-langchain_tutorial_fast)
-  - [LangGraph](#4-langgraph)
-  - [PydanticAI](#5-pydanticai)
-  - [PydanticGraph](#6-pydanticgraph)
-  - [Agents（多模态）](#7-agents多模态-agent)
-  - [Agno](#8-agno)
-  - [Experiment（实验与场景）](#9-experiment实验与场景)
+  - [HyDE](#2-hyde)
+  - [RAGFusion](#3-ragfusion)
+  - [LangChain_RAG_Proj](#4-langchain_rag_proj推荐入门)
+  - [LangChain_Tutorial_Fast](#5-langchain_tutorial_fast)
+  - [LangGraph](#6-langgraph)
+  - [PydanticAI](#7-pydanticai)
+  - [PydanticGraph](#8-pydanticgraph)
+  - [Agents（多模态）](#9-agents多模态-agent)
+  - [Agno](#10-agno)
+  - [Experiment（实验与场景）](#11-experiment实验与场景)
 - [技术栈](#技术栈)
 - [安装与环境配置](#安装与环境配置)
 - [学习路径与快速开始](#学习路径与快速开始)
@@ -27,35 +29,34 @@
 ## 项目结构
 
 ```
-RAG/
-├── AgenticRAG/                # Agentic RAG 学习（新）
-│   ├── demo.py                # MVP 示例（DashScope Embedding + gpt-5.4）
-│   ├── AgenticRAG论文汇总.md
-│   └── README.md
-├── Agents/                    # 多模态 Agent（Agno + Gemini / Ollama）
-│   └── multimodal_agent/
-├── Agno/                      # Agno 框架入门与助手
-│   ├── 00_Get_Started/
-│   └── 01_Assist_Agent/
-├── LangChain_Tutorial_Fast/   # LangChain 快速教程（31 个示例）
-├── LangChain_RAG_Proj/        # 完整 RAG 项目（生产级）
-├── LangGraph/                 # LangGraph 图式编程
-│   ├── 00–06_*.py             # Hello World、多输入、条件图、循环图
-│   ├── Offcial_Tutorial/      # 官方教程（00–09）：快速开始、并行化、路由、Orchestrator、Agent 等
-│   └── Archive/               # freeCodeCamp 课程归档（Agents、Exercises、Graphs）
-├── PydanticAI/                # PydanticAI 框架实践
-├── PydanticGraph/             # Pydantic Graph 图式工作流
-├── Experiment/                # 实验与场景示例
-│   ├── graph-rag-agent/       # GraphRAG + DeepSearch 多 Agent（Neo4j）
-│   ├── CRAG/                  # 纠正式 RAG（FastAPI + Streamlit）
-│   ├── VideoCut/              # 智能视频合成（LangGraph + FFmpeg）
-│   ├── LongRuiGame/           # 游戏玩家智能问答（RAG + 工具调用）
-│   ├── Obsidian/              # Obsidian 知识库（LlamaIndex + Ollama）
-│   ├── NanoBat/               # Qwen 驱动轻量助手（通义 API）
-│   └── Batnet.py              # 终端 Matrix 风格动态演示
+RAG-learning/
+├── Foundations/               # 阶段一：基础入门
+│   └── LangChain_Tutorial_Fast/   # LangChain 31 个循序渐进示例
+├── Frameworks/                # 阶段二：框架学习（平行，无强制顺序）
+│   ├── LangGraph/
+│   ├── PydanticAI/
+│   ├── PydanticGraph/
+│   ├── Agno/
+│   └── Agents/
+├── RAG-Techniques/            # 阶段三：RAG 改进技术
+│   ├── Basic/
+│   │   ├── HyDE/              # Hypothetical Document Embeddings
+│   │   └── RAGFusion/         # 查询扩展 + RRF 融合检索
+│   └── Advanced/
+│       ├── AgenticRAG/        # 自主决策检索（多步推理）
+│       └── CRAG/              # 纠正式 RAG
+├── Projects/                  # 阶段四：生产级完整项目
+│   └── LangChain_RAG_Proj/
+├── Experiment/                # 实验与场景
+│   ├── graph-rag-agent/
+│   ├── VideoCut/
+│   ├── LongRuiGame/
+│   ├── Obsidian/
+│   ├── NanoBat/
+│   └── Datawhale-LLM/
 ├── Archive/                   # 历史代码归档
-├── Data/                      # 测试数据（JSON、TXT）
-├── pyproject.toml             # uv 依赖管理
+├── Data/                      # 测试数据
+├── pyproject.toml
 └── requirements.txt
 ```
 
@@ -65,37 +66,72 @@ RAG/
 
 ### 1. AgenticRAG（新）
 
-**[AgenticRAG/](AgenticRAG/)** — Agentic RAG 学习目录，探索让模型在多步推理中自主决定何时检索、检索什么、如何修正答案。
+**[RAG-Techniques/Advanced/AgenticRAG/](RAG-Techniques/Advanced/AgenticRAG/)** — Agentic RAG 学习目录，探索让模型在多步推理中自主决定何时检索、检索什么、如何修正答案。
 
 | 文件 | 说明 |
 |---|---|
-| [demo.py](AgenticRAG/demo.py) | MVP 示例：DashScope `text-embedding-v1` + `gpt-5.4`，自建向量库，单轮 Agentic 推理 |
-| [AgenticRAG论文汇总.md](AgenticRAG/AgenticRAG论文汇总.md) | 核心论文（Self-RAG、CRAG、IRCoT 等）整理与解读 |
-| [README.md](AgenticRAG/README.md) | 概念对比、学习路径、核心概念速查、自测清单 |
+| [demo.py](RAG-Techniques/Advanced/AgenticRAG/demo.py) | MVP 示例：DashScope `text-embedding-v1` + `gpt-5.4`，自建向量库，单轮 Agentic 推理 |
+| [AgenticRAG论文汇总.md](RAG-Techniques/Advanced/AgenticRAG/AgenticRAG论文汇总.md) | 核心论文（Self-RAG、CRAG、IRCoT 等）整理与解读 |
+| [README.md](RAG-Techniques/Advanced/AgenticRAG/README.md) | 概念对比、学习路径、核心概念速查、自测清单 |
 
 ```bash
 # 配置网关与密钥后直接运行
-cd AgenticRAG
+cd RAG-Techniques/Advanced/AgenticRAG
 uv run python demo.py
 ```
 
 ---
 
-### 2. LangChain_RAG_Proj（推荐入门）
+### 2. HyDE（Hypothetical Document Embeddings）
+
+**[RAG-Techniques/Basic/HyDE/](RAG-Techniques/Basic/HyDE/)** — 让 LLM 先生成一篇「假设文档」，再用该文档的向量做检索，从而缩小 query 与 passage 之间的语义鸿沟。
+
+| 文件 | 说明 |
+|---|---|
+| [demo.py](RAG-Techniques/Basic/HyDE/demo.py) | HyDE 完整示例 |
+| [README.md](RAG-Techniques/Basic/HyDE/README.md) | 原理说明与使用方式 |
+
+```bash
+cd RAG-Techniques/Basic/HyDE
+python demo.py
+```
+
+---
+
+### 3. RAGFusion
+
+**[RAG-Techniques/Basic/RAGFusion/](RAG-Techniques/Basic/RAGFusion/)** — 通过查询扩展生成多个子查询，多路检索后用 RRF（Reciprocal Rank Fusion）算法融合排名，提升召回质量。
+
+| 文件 | 说明 |
+|---|---|
+| [01_query_expansion.py](RAG-Techniques/Basic/RAGFusion/01_query_expansion.py) | 查询扩展 |
+| [02_rrf_algorithm.py](RAG-Techniques/Basic/RAGFusion/02_rrf_algorithm.py) | RRF 算法实现 |
+| [03_rag_fusion_pipeline.py](RAG-Techniques/Basic/RAGFusion/03_rag_fusion_pipeline.py) | 完整 pipeline |
+| [04_comparison.py](RAG-Techniques/Basic/RAGFusion/04_comparison.py) | 与朴素 RAG 对比 |
+| [README.md](RAG-Techniques/Basic/RAGFusion/README.md) | 原理说明 |
+
+```bash
+cd RAG-Techniques/Basic/RAGFusion
+python 01_query_expansion.py
+```
+
+---
+
+### 4. LangChain_RAG_Proj（推荐入门）
 
 企业级 RAG 应用，包含知识库管理（上传、向量化、去重）、智能问答（RAG + 对话历史）、Streamlit Web 界面与持久化存储。
 
 ```bash
-cd LangChain_RAG_Proj
+cd Projects/LangChain_RAG_Proj
 streamlit run app_qa.py
 streamlit run app_file_uploader.py   # 知识库上传
 ```
 
-详见 [LangChain_RAG_Proj/README.md](LangChain_RAG_Proj/README.md)。
+详见 [Projects/LangChain_RAG_Proj/README.md](Projects/LangChain_RAG_Proj/README.md)。
 
 ---
 
-### 3. LangChain_Tutorial_Fast
+### 5. LangChain_Tutorial_Fast
 
 31 个循序渐进示例：
 
@@ -108,13 +144,13 @@ streamlit run app_file_uploader.py   # 知识库上传
 | 24–31 | 完整 RAG 流程（文档加载、分块、向量检索） |
 
 ```bash
-cd LangChain_Tutorial_Fast
+cd Foundations/LangChain_Tutorial_Fast
 python 01_LLM.py
 ```
 
 ---
 
-### 4. LangGraph
+### 6. LangGraph
 
 图式编程示例，分两个层次：
 
@@ -127,7 +163,7 @@ python 01_LLM.py
 | `05_ConditionalGraph.py` | 条件边 |
 | `06_LoopingGraph.py` | 循环图 |
 
-**官方教程**（[Offcial_Tutorial/](LangGraph/Offcial_Tutorial/)，`00–09_*.py`）：
+**官方教程**（[Offcial_Tutorial/](Frameworks/LangGraph/Offcial_Tutorial/)，`00–09_*.py`）：
 
 | 文件 | 说明 |
 |---|---|
@@ -141,36 +177,36 @@ python 01_LLM.py
 | `07/08_PersonalAssistants*.py` | 个人助手（OpenAI / Ollama） |
 | `09_CustomRAG.py` | 自定义 RAG 图 |
 
-**归档课程**（[Archive/LangGraph-Course-freeCodeCamp/](LangGraph/Archive/LangGraph-Course-freeCodeCamp/)）：freeCodeCamp LangGraph 完整课程，含 Agents、练习 Notebooks 与 Graphs。
+**归档课程**（[Archive/LangGraph-Course-freeCodeCamp/](Frameworks/LangGraph/Archive/LangGraph-Course-freeCodeCamp/)）：freeCodeCamp LangGraph 完整课程，含 Agents、练习 Notebooks 与 Graphs。
 
 ---
 
-### 5. PydanticAI
+### 7. PydanticAI
 
 类型安全 AI 应用框架实践：入门与模型接入、多工具 Agent、结构化输出与流式、ChatApp、BankSupport、SQL 生成与 RAG（pgvector）、AG-UI、复杂工作流。
 
-详见 [PydanticAI/README.md](PydanticAI/README.md)。
+详见 [Frameworks/PydanticAI/README.md](Frameworks/PydanticAI/README.md)。
 
 ---
 
-### 6. PydanticGraph
+### 8. PydanticGraph
 
 图式状态机与 DAG：售货机、邮件反馈、问答图、Mermaid 图导出。
 
 ```bash
-cd PydanticGraph
+cd Frameworks/PydanticGraph
 python vending_machine.py
 ```
 
 ---
 
-### 7. Agents（多模态 Agent）
+### 9. Agents（多模态 Agent）
 
 基于 Agno 的多模态 Agent（Streamlit），支持 Gemini、Ollama，处理视频、图像与文本。
 
 ---
 
-### 8. Agno
+### 10. Agno
 
 Agno 框架入门与助手型 Agent：
 
@@ -178,18 +214,18 @@ Agno 框架入门与助手型 Agent：
 - `01_Assist_Agent/`：助手型 Agent
 
 ```bash
-cd Agno/00_Get_Started
+cd Frameworks/Agno/00_Get_Started
 python 00_HelloAgno.py
 ```
 
 ---
 
-### 9. Experiment（实验与场景）
+### 11. Experiment（实验与场景）
 
 | 子目录 | 说明 | 文档 |
 |---|---|---|
 | **graph-rag-agent/** | GraphRAG + DeepSearch 多 Agent 问答：知识图谱、多级检索、Plan-Execute-Report、Neo4j、FastAPI + Streamlit | [readme.md](Experiment/graph-rag-agent/readme.md) |
-| **CRAG/** | 纠正式 RAG：检索评估 → Correct / Incorrect / Ambiguous → 知识精炼或网络搜索；FastAPI + Streamlit，MinerU PDF | [README.md](Experiment/CRAG/README.md) |
+| **CRAG/** | 纠正式 RAG：检索评估 → Correct / Incorrect / Ambiguous → 知识精炼或网络搜索；FastAPI + Streamlit，MinerU PDF | [README.md](RAG-Techniques/Advanced/CRAG/README.md) |
 | **VideoCut/** | 智能视频合成与防重复：LangGraph 状态图、分镜脚本（YAML）、素材库、FFmpeg | [README.md](Experiment/VideoCut/README.md) |
 | **LongRuiGame/** | 游戏玩家智能问答：RAG（game_faq.json）+ 工具调用、模糊问题反问、问答日志 | [README.md](Experiment/LongRuiGame/README.md) |
 | **Obsidian/** | Obsidian 知识库：LlamaIndex + Ollama（qwen3-vl / qwen3-embedding），增量索引与本地问答 | — |
@@ -259,38 +295,44 @@ ollama pull qwen3-vl:4b          # 多模态（可选）
 ### 推荐路径
 
 ```
-LangChain_Tutorial_Fast (01→31)
+Foundations/LangChain_Tutorial_Fast (01→31)
        ↓
-LangChain_RAG_Proj（生产级 RAG）
+Projects/LangChain_RAG_Proj（生产级 RAG）
        ↓
-LangGraph/Offcial_Tutorial (00→09)
+Frameworks/LangGraph/Offcial_Tutorial (00→09)
        ↓
-AgenticRAG（Agentic 推理）
+RAG-Techniques/Basic/HyDE
+RAG-Techniques/Basic/RAGFusion
        ↓
-PydanticAI / Agno（多框架对比）
+RAG-Techniques/Advanced/AgenticRAG
+RAG-Techniques/Advanced/CRAG
        ↓
-Experiment/*（CRAG、GraphRAG、VideoCut 等实验）
+Frameworks/PydanticAI / Frameworks/Agno（多框架对比）
+       ↓
+Experiment/*（实验项目）
 ```
 
 ### 快速启动命令
 
 | 目标 | 命令 |
 |---|---|
-| LangChain 教程 | `cd LangChain_Tutorial_Fast && python 01_LLM.py` |
-| RAG 问答 Web | `cd LangChain_RAG_Proj && streamlit run app_qa.py` |
-| LangGraph 基础 | `cd LangGraph && python 00_HelloWorld_Graph.py` |
-| LangGraph 官方教程 | `cd LangGraph/Offcial_Tutorial && python 00_quickstart.py` |
-| AgenticRAG Demo | `cd AgenticRAG && uv run python demo.py` |
-| PydanticAI | `cd PydanticAI/00_Preparation && python HelloPydanticAI.py` |
-| PydanticGraph | `cd PydanticGraph && python vending_machine.py` |
-| Agno | `cd Agno/00_Get_Started && python 00_HelloAgno.py` |
-| CRAG | `cd Experiment/CRAG && streamlit run app_streamlit.py` |
-| graph-rag-agent | `cd Experiment/graph-rag-agent && uvicorn server.main:app --reload` |
-| VideoCut | `cd Experiment/VideoCut && uvicorn api.main:app --reload` |
-| LongRuiGame 问答 | `cd Experiment/LongRuiGame/scene1_player_qa && python player_qa_agent.py` |
-| Obsidian 知识库 | 修改 vault 路径 → `python Experiment/Obsidian/obsidian_loader.py` → `python obsidian_agent.py` |
-| NanoBat 助手 | `cd Experiment/NanoBat && cp .env.example .env`，填写 `DASHSCOPE_API_KEY` → `python main.py` |
-| Batnet 演示 | `python Experiment/Batnet.py` |
+| LangChain 教程 | `cd Foundations/LangChain_Tutorial_Fast && python 01_LLM.py` |
+| RAG 问答 Web | `cd Projects/LangChain_RAG_Proj && streamlit run app_qa.py` |
+| LangGraph 基础 | `cd Frameworks/LangGraph && python 00_HelloWorld_Graph.py` |
+| LangGraph 官方教程 | `cd Frameworks/LangGraph/Offcial_Tutorial && python 00_quickstart.py` |
+| AgenticRAG Demo | `cd RAG-Techniques/Advanced/AgenticRAG && uv run python demo.py` |
+| HyDE Demo | `cd RAG-Techniques/Basic/HyDE && python demo.py` |
+| RAGFusion | `cd RAG-Techniques/Basic/RAGFusion && python 01_query_expansion.py` |
+| PydanticAI | `cd Frameworks/PydanticAI/00_Preparation && python HelloPydanticAI.py` |
+| PydanticGraph | `cd Frameworks/PydanticGraph && python vending_machine.py` |
+| Agno | `cd Frameworks/Agno/00_Get_Started && python 00_HelloAgno.py` |
+| CRAG | `cd RAG-Techniques/Advanced/CRAG && streamlit run app_streamlit.py` |
+| graph-rag-agent | `cd Experiment/graph-rag-agent && uvicorn server.main:app --reload`（不变） |
+| VideoCut | `cd Experiment/VideoCut && uvicorn api.main:app --reload`（不变） |
+| LongRuiGame 问答 | `cd Experiment/LongRuiGame/scene1_player_qa && python player_qa_agent.py`（不变） |
+| Obsidian 知识库 | 修改 vault 路径 → `python Experiment/Obsidian/obsidian_loader.py`（不变） |
+| NanoBat 助手 | `cd Experiment/NanoBat && cp .env.example .env`（不变） |
+| Batnet 演示 | `python Experiment/Batnet.py`（不变） |
 
 ---
 
@@ -300,15 +342,17 @@ Experiment/*（CRAG、GraphRAG、VideoCut 等实验）
 
 | 项目 | 文档 |
 |---|---|
-| AgenticRAG | [AgenticRAG/README.md](AgenticRAG/README.md) |
-| LangChain_RAG_Proj | [LangChain_RAG_Proj/README.md](LangChain_RAG_Proj/README.md) |
-| PydanticAI | [PydanticAI/README.md](PydanticAI/README.md) |
+| AgenticRAG | [RAG-Techniques/Advanced/AgenticRAG/README.md](RAG-Techniques/Advanced/AgenticRAG/README.md) |
+| HyDE | [RAG-Techniques/Basic/HyDE/README.md](RAG-Techniques/Basic/HyDE/README.md) |
+| RAGFusion | [RAG-Techniques/Basic/RAGFusion/README.md](RAG-Techniques/Basic/RAGFusion/README.md) |
+| LangChain_RAG_Proj | [Projects/LangChain_RAG_Proj/README.md](Projects/LangChain_RAG_Proj/README.md) |
+| PydanticAI | [Frameworks/PydanticAI/README.md](Frameworks/PydanticAI/README.md) |
+| CRAG | [RAG-Techniques/Advanced/CRAG/README.md](RAG-Techniques/Advanced/CRAG/README.md) |
 | graph-rag-agent | [Experiment/graph-rag-agent/readme.md](Experiment/graph-rag-agent/readme.md) |
-| CRAG | [Experiment/CRAG/README.md](Experiment/CRAG/README.md) |
 | VideoCut | [Experiment/VideoCut/README.md](Experiment/VideoCut/README.md) |
 | LongRuiGame | [Experiment/LongRuiGame/README.md](Experiment/LongRuiGame/README.md) |
 | NanoBat | [Experiment/NanoBat/README.md](Experiment/NanoBat/README.md) |
-| LangGraph freeCodeCamp | [LangGraph/Archive/LangGraph-Course-freeCodeCamp/README.md](LangGraph/Archive/LangGraph-Course-freeCodeCamp/README.md) |
+| LangGraph freeCodeCamp | [Frameworks/LangGraph/Archive/LangGraph-Course-freeCodeCamp/README.md](Frameworks/LangGraph/Archive/LangGraph-Course-freeCodeCamp/README.md) |
 
 ### 官方文档
 
@@ -329,4 +373,4 @@ Experiment/*（CRAG、GraphRAG、VideoCut 等实验）
 欢迎提交 Issue 与 Pull Request。本项目仅用于学习与研究。
 
 **作者**: Beamus Wayne  
-**最后更新**: 2026-04-02
+**最后更新**: 2026-04-10

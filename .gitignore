@@ -67,6 +67,9 @@ chat_history/
 Thumbs.db
 .DS_Store
 
+# Local docs (design specs, brainstorming notes)
+docs/
+
 # Large archives (over GitHub 100MB limit)
 Experiment/Lake-2026.02.08-bak.zip
 Experiment/.openclaw.zip
