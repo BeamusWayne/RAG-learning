@@ -1,0 +1,5 @@
+.env
+.chroma_db/
+.graph_store/
+__pycache__/
+*.pyc
