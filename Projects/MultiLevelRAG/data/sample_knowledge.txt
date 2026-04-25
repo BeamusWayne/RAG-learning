@@ -1,0 +1,54 @@
+# RAG 技术概览
+
+## 什么是 RAG？
+RAG（Retrieval-Augmented Generation，检索增强生成）是一种结合信息检索与大语言模型的 AI 技术框架。它通过在生成答案前先从外部知识库中检索相关文档，显著提升了 LLM 的事实准确性与可解释性。
+
+## Baseline RAG
+标准 RAG 流程：用户问题 → 向量检索 → 检索文档 → 拼接上下文 → LLM 生成答案。
+优点：实现简单，速度快，适合精确查询。
+缺点：检索质量受限于查询表达，单一检索路径。
+
+## HyDE（Hypothetical Document Embeddings）
+HyDE 让 LLM 先生成一篇「假设文档」，再用该文档的向量做检索，缩小 query 与 passage 之间的语义鸿沟。
+适用场景：专业领域问答、query 较短但 passage 较长的场景。
+
+## RAG Fusion
+RAG Fusion 通过查询扩展生成多个子查询，多路检索后用 RRF（Reciprocal Rank Fusion）算法融合排名，提升召回质量。
+核心思想：单一查询可能遗漏相关文档，多查询覆盖更广。
+
+## CRAG（Corrective RAG）
+CRAG 在检索后增加相关性评估步骤：
+- Correct（相关性高）：精炼内部知识后直接生成
+- Incorrect（相关性低）：转向网络搜索
+- Ambiguous（介于两者）：内外知识融合
+来源：Yan et al., 2024 "Corrective Retrieval Augmented Generation"
+
+## GraphRAG
+GraphRAG 将文档中的实体关系构建为知识图谱，在检索时结合向量检索与图遍历，捕获多跳关系。
+适用场景：需要推理实体关系的复杂问题、医疗/法律/金融领域的结构化知识。
+微软 GraphRAG：使用社区检测（Leiden 算法）构建层级知识图谱。
+
+## Agentic RAG
+Agentic RAG 让 LLM 作为 Agent 自主决定：何时检索、检索什么、是否需要多步推理。
+代表工作：Self-RAG（Asai et al., 2023）、IRCoT（Iterative Retrieval Chain of Thought）。
+
+## 业界最佳实践
+1. Chunking 策略：语义分块优于固定长度，800 字符 + 80 重叠是常用起点
+2. Embedding 选型：text-embedding-v3（DashScope）、text-embedding-3-large（OpenAI）
+3. 重排序（Reranker）：使用 cross-encoder 对检索结果重排，显著提升 top-k 质量
+4. 混合检索：BM25（关键词）+ 向量检索，融合稀疏与稠密表示
+5. Query 改写：LLM 改写用户问题去除歧义，提升检索精准度
+6. 评估体系：RAGAS 框架（忠实度、答案相关性、上下文精确率/召回率）
+
+## 向量数据库选型
+- Chroma：轻量，适合本地开发与学习
+- pgvector：PostgreSQL 扩展，适合生产级应用
+- Pinecone / Weaviate：托管云服务，适合大规模场景
+- Milvus：高性能开源，适合亿级向量
+
+## 常见挑战与解决方案
+1. 检索结果不相关 → 使用 CRAG 相关性评估 + 知识精炼
+2. 多跳推理失败 → GraphRAG 图遍历
+3. 长文档上下文丢失 → 分层索引（摘要层 + 细节层）
+4. 幻觉问题 → 引用溯源、忠实度评分
+5. 实时性 → 流式检索 + 网络搜索混合

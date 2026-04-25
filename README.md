@@ -2,6 +2,8 @@
 
 本项目为 **RAG（Retrieval-Augmented Generation，检索增强生成）** 的完整学习与实践仓库，覆盖从基础概念到生产级应用的完整技术栈，并包含多框架 Agent、图式工作流与实验性 RAG 改进（如 CRAG、GraphRAG、Agentic RAG）。
 
+> **新增**: [MultiLevelRAG](Projects/MultiLevelRAG/) — 意图路由 × 5 种 RAG 策略 × Streamlit 对比平台（MiniMax-M2.5 驱动）
+
 ---
 
 ## 目录
