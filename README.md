@@ -13,17 +13,18 @@
 - [项目结构](#项目结构)
 - [核心项目](#核心项目)
   - [MultiLevelRAG（新）](#1-multilevelrag新)
-  - [AgenticRAG](#2-agenticrag)
-  - [HyDE](#3-hyde)
-  - [RAGFusion](#4-ragfusion)
-  - [LangChain_RAG_Proj](#5-langchain_rag_proj推荐入门)
-  - [LangChain_Tutorial_Fast](#6-langchain_tutorial_fast)
-  - [LangGraph](#7-langgraph)
-  - [PydanticAI](#8-pydanticai)
-  - [PydanticGraph](#9-pydanticgraph)
-  - [Agents（多模态）](#10-agents多模态-agent)
-  - [Agno](#11-agno)
-  - [Experiment（实验与场景）](#12-experiment实验与场景)
+  - [Self-RAG（新）](#2-self-rag新)
+  - [AgenticRAG](#3-agenticrag)
+  - [HyDE](#4-hyde)
+  - [RAGFusion](#5-ragfusion)
+  - [LangChain_RAG_Proj](#6-langchain_rag_proj推荐入门)
+  - [LangChain_Tutorial_Fast](#7-langchain_tutorial_fast)
+  - [LangGraph](#8-langgraph)
+  - [PydanticAI](#9-pydanticai)
+  - [PydanticGraph](#10-pydanticgraph)
+  - [Agents（多模态）](#11-agents多模态-agent)
+  - [Agno](#12-agno)
+  - [Experiment（实验与场景）](#13-experiment实验与场景)
 - [技术栈](#技术栈)
 - [安装与环境配置](#安装与环境配置)
 - [学习路径与快速开始](#学习路径与快速开始)
@@ -50,7 +51,8 @@ RAG-learning/
 │   │   └── RAGFusion/         # 查询扩展 + RRF 融合检索
 │   └── Advanced/
 │       ├── AgenticRAG/        # 自主决策检索（多步推理）
-│       └── CRAG/              # 纠正式 RAG
+│       ├── CRAG/              # 纠正式 RAG
+│       └── Self-RAG/          # 反思式 RAG（Retrieve / IsRel / IsSup / IsUse）
 ├── Projects/                  # 阶段四：生产级完整项目
 │   ├── LangChain_RAG_Proj/
 │   └── MultiLevelRAG/         # 意图路由 × 5 种 RAG 策略 × Streamlit 对比平台
@@ -92,7 +94,25 @@ streamlit run app.py
 
 ---
 
-### 2. AgenticRAG
+### 2. Self-RAG（新）
+
+**[RAG-Techniques/Advanced/Self-RAG/](RAG-Techniques/Advanced/Self-RAG/)** — 反思式 RAG。模型在回答过程中**自己决定是否检索（Retrieve）**、**逐段判定相关性（IsRel）**、**判定答案是否被段落支持（IsSup）**、**给整体答案打分（IsUse）**，显著降低幻觉。
+
+| 文件 | 说明 |
+|---|---|
+| [demo.py](RAG-Techniques/Advanced/Self-RAG/demo.py) | 四个反思决策点的最小教学实现，输出完整反思轨迹 |
+| [README.md](RAG-Techniques/Advanced/Self-RAG/README.md) | 原理、流程图、与 CRAG/AgenticRAG 对比、自测清单 |
+
+```bash
+cd RAG-Techniques/Advanced/Self-RAG
+uv run python demo.py
+```
+
+> 论文：Asai et al., 2023. *Self-RAG: Learning to Retrieve, Generate, and Critique through Self-Reflection.* [arXiv:2310.11511](https://arxiv.org/abs/2310.11511)
+
+---
+
+### 3. AgenticRAG
 
 **[RAG-Techniques/Advanced/AgenticRAG/](RAG-Techniques/Advanced/AgenticRAG/)** — Agentic RAG 学习目录，探索让模型在多步推理中自主决定何时检索、检索什么、如何修正答案。
 
@@ -110,7 +130,7 @@ uv run python demo.py
 
 ---
 
-### 3. HyDE（Hypothetical Document Embeddings）
+### 4. HyDE（Hypothetical Document Embeddings）
 
 **[RAG-Techniques/Basic/HyDE/](RAG-Techniques/Basic/HyDE/)** — 让 LLM 先生成一篇「假设文档」，再用该文档的向量做检索，从而缩小 query 与 passage 之间的语义鸿沟。
 
@@ -126,7 +146,7 @@ python demo.py
 
 ---
 
-### 4. RAGFusion
+### 5. RAGFusion
 
 **[RAG-Techniques/Basic/RAGFusion/](RAG-Techniques/Basic/RAGFusion/)** — 通过查询扩展生成多个子查询，多路检索后用 RRF（Reciprocal Rank Fusion）算法融合排名，提升召回质量。
 
@@ -145,7 +165,7 @@ python 01_query_expansion.py
 
 ---
 
-### 5. LangChain_RAG_Proj（推荐入门）
+### 6. LangChain_RAG_Proj（推荐入门）
 
 企业级 RAG 应用，包含知识库管理（上传、向量化、去重）、智能问答（RAG + 对话历史）、Streamlit Web 界面与持久化存储。
 
@@ -159,7 +179,7 @@ streamlit run app_file_uploader.py   # 知识库上传
 
 ---
 
-### 6. LangChain_Tutorial_Fast
+### 7. LangChain_Tutorial_Fast
 
 31 个循序渐进示例：
 
@@ -178,7 +198,7 @@ python 01_LLM.py
 
 ---
 
-### 7. LangGraph
+### 8. LangGraph
 
 图式编程示例，分两个层次：
 
@@ -209,7 +229,7 @@ python 01_LLM.py
 
 ---
 
-### 8. PydanticAI
+### 9. PydanticAI
 
 类型安全 AI 应用框架实践：入门与模型接入、多工具 Agent、结构化输出与流式、ChatApp、BankSupport、SQL 生成与 RAG（pgvector）、AG-UI、复杂工作流。
 
@@ -217,7 +237,7 @@ python 01_LLM.py
 
 ---
 
-### 9. PydanticGraph
+### 10. PydanticGraph
 
 图式状态机与 DAG：售货机、邮件反馈、问答图、Mermaid 图导出。
 
@@ -228,13 +248,13 @@ python vending_machine.py
 
 ---
 
-### 10. Agents（多模态 Agent）
+### 11. Agents（多模态 Agent）
 
 基于 Agno 的多模态 Agent（Streamlit），支持 Gemini、Ollama，处理视频、图像与文本。
 
 ---
 
-### 11. Agno
+### 12. Agno
 
 Agno 框架入门与助手型 Agent：
 
@@ -248,7 +268,7 @@ python 00_HelloAgno.py
 
 ---
 
-### 12. Experiment（实验与场景）
+### 13. Experiment（实验与场景）
 
 | 子目录 | 说明 | 文档 |
 |---|---|---|
@@ -336,6 +356,7 @@ RAG-Techniques/Basic/RAGFusion
        ↓
 RAG-Techniques/Advanced/AgenticRAG
 RAG-Techniques/Advanced/CRAG
+RAG-Techniques/Advanced/Self-RAG
        ↓
 Projects/MultiLevelRAG（多策略路由 + 全策略并行对比）
        ↓
@@ -354,6 +375,7 @@ Experiment/*（实验项目）
 | LangGraph 基础 | `cd Frameworks/LangGraph && python 00_HelloWorld_Graph.py` |
 | LangGraph 官方教程 | `cd Frameworks/LangGraph/Offcial_Tutorial && python 00_quickstart.py` |
 | AgenticRAG Demo | `cd RAG-Techniques/Advanced/AgenticRAG && uv run python demo.py` |
+| Self-RAG Demo | `cd RAG-Techniques/Advanced/Self-RAG && uv run python demo.py` |
 | HyDE Demo | `cd RAG-Techniques/Basic/HyDE && python demo.py` |
 | RAGFusion | `cd RAG-Techniques/Basic/RAGFusion && python 01_query_expansion.py` |
 | PydanticAI | `cd Frameworks/PydanticAI/00_Preparation && python HelloPydanticAI.py` |
@@ -377,6 +399,7 @@ Experiment/*（实验项目）
 |---|---|
 | RAG 技术范式总览 | [RAG-Techniques/RAG范式总览.md](RAG-Techniques/RAG范式总览.md) |
 | MultiLevelRAG | [Projects/MultiLevelRAG/README.md](Projects/MultiLevelRAG/README.md) |
+| Self-RAG | [RAG-Techniques/Advanced/Self-RAG/README.md](RAG-Techniques/Advanced/Self-RAG/README.md) |
 | AgenticRAG | [RAG-Techniques/Advanced/AgenticRAG/README.md](RAG-Techniques/Advanced/AgenticRAG/README.md) |
 | HyDE | [RAG-Techniques/Basic/HyDE/README.md](RAG-Techniques/Basic/HyDE/README.md) |
 | RAGFusion | [RAG-Techniques/Basic/RAGFusion/README.md](RAG-Techniques/Basic/RAGFusion/README.md) |
@@ -408,4 +431,4 @@ Experiment/*（实验项目）
 欢迎提交 Issue 与 Pull Request。本项目仅用于学习与研究。
 
 **作者**: Beamus Wayne  
-**最后更新**: 2026-04-28
+**最后更新**: 2026-04-29
