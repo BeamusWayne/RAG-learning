@@ -5,6 +5,8 @@
 > **新增**: [MultiLevelRAG](Projects/MultiLevelRAG/) — 意图路由 × 5 种 RAG 策略 × Streamlit 对比平台（MiniMax-M2.5 驱动）
 >
 > **新增文档**: [RAG 技术范式总览](RAG-Techniques/RAG范式总览.md) — 面向初学者梳理 Naive RAG、CRAG、GraphRAG、Agentic RAG、RAPTOR、HyDE、RAG-Fusion 等主流 RAG 范式。
+>
+> **新增工程前置课**: [RAG Primer](Foundations/RAG-Primer/) — 切分 / 向量化 / 召回 / 重排 / 评估 9 大模块 + [新手 4 周教程](Foundations/RAG-Primer/TUTORIAL.md)。
 
 ---
 
