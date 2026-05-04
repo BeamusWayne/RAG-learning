@@ -6,10 +6,23 @@
 - 子项目目录：`Projects/RAGAS-Learning/`
 - 标准启动路径：`cd Projects/RAGAS-Learning && ./init.sh`
 - 标准验证路径：`cd Projects/RAGAS-Learning && python -c "import ragas; print(ragas.__version__)"`
-- 当前最高优先级未完成功能：ragas-003 — Answer Relevancy（答案相关性）学习 demo
+- 当前最高优先级未完成功能：ragas-004 — Context Precision（上下文精度）学习 demo
 - 当前 blocker：无
 
 ## 会话记录
+
+### Session 004 — 2026-05-04
+
+- 日期：2026-05-04
+- 本轮目标：完成 ragas-003 Answer Relevancy demo
+- 已完成：ragas-003 验证通过（相关答案 0.8739，不相关答案 0.4567）
+- 关键发现：
+  1. ResponseRelevancy 需要 LLM + Embeddings 两部分
+  2. glm-4-flash 的反向问题生成质量不足，需用 glm-4-plus
+  3. Embeddings 使用智谱 embedding-3（OpenAI 兼容接口）
+  4. LangchainEmbeddingsWrapper 包装 langchain embedding 供 RAGAS 使用
+- 更新过的文件：demo_answer_relevancy.py, feature_list.json, tutorial.html, claude-progress.md
+- 下一步最佳动作：ragas-004 Context Precision demo
 
 ### Session 003 — 2026-05-04
 

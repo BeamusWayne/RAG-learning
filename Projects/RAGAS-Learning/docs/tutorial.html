@@ -332,7 +332,7 @@
     </div>
     <div class="nav-item" data-ch="ch3">
       <span>03 Answer Relevancy</span>
-      <span class="badge badge-pending">TODO</span>
+      <span class="badge badge-passing">PASS</span>
     </div>
     <div class="nav-item" data-ch="ch4">
       <span>04 Context Precision</span>
@@ -568,12 +568,84 @@ llm = llm_factory(<span class="string">"glm-4-flash"</span>, client=client)</pre
   <div class="chapter-header">
     <h2>03 Answer Relevancy（答案相关性）</h2>
     <span class="tag tag-metrics">METRICS</span>
-    <span class="badge badge-pending" style="font-size:12px;padding:3px 10px;">TODO</span>
+    <span class="badge badge-passing" style="font-size:12px;padding:3px 10px;">PASSING</span>
     <p class="desc">Answer Relevancy 衡量生成的答案与用户提问的相关程度。答非所问会得到低分。</p>
   </div>
-  <div class="callout callout-info">
-    <span class="callout-icon">&#128640;</span>
-    <div>本章节将在 ragas-003 阶段完成。</div>
+
+  <div class="step open">
+    <div class="step-head">
+      <div class="step-num done">1</div>
+      <span class="step-title">核心原理</span>
+      <span class="step-arrow">&#9654;</span>
+    </div>
+    <div class="step-body">
+      <p>Answer Relevancy 的评估方式很巧妙：它不直接比较问题和答案，而是<strong>从答案反向生成可能的问题</strong>，然后计算生成问题与原始问题的语义相似度。</p>
+      <div class="callout callout-info">
+        <span class="callout-icon">&#128218;</span>
+        <div>因此它需要两个组件：<strong>LLM</strong>（生成反向问题）+ <strong>Embeddings</strong>（计算语义相似度）。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step open">
+    <div class="step-head">
+      <div class="step-num done">2</div>
+      <span class="step-title">完整源码</span>
+      <span class="step-arrow">&#9654;</span>
+    </div>
+    <div class="step-body">
+      <pre><span class="keyword">import</span> asyncio
+<span class="keyword">from</span> dotenv <span class="keyword">import</span> load_dotenv
+<span class="keyword">from</span> openai <span class="keyword">import</span> OpenAI
+<span class="keyword">from</span> langchain_openai <span class="keyword">import</span> OpenAIEmbeddings
+<span class="keyword">from</span> ragas.dataset_schema <span class="keyword">import</span> SingleTurnSample
+<span class="keyword">from</span> ragas.embeddings <span class="keyword">import</span> LangchainEmbeddingsWrapper
+<span class="keyword">from</span> ragas.llms <span class="keyword">import</span> llm_factory
+<span class="keyword">from</span> ragas.metrics._answer_relevance <span class="keyword">import</span> ResponseRelevancy
+
+load_dotenv(<span class="string">"../../.env"</span>)
+
+<span class="comment"># LLM — 用 glm-4-plus（flash 的反向问题质量不足）</span>
+client = OpenAI(
+    api_key=os.environ[<span class="string">"ZHIPU_API_KEY"</span>],
+    base_url=<span class="string">"https://open.bigmodel.cn/api/paas/v4"</span>,
+)
+llm = llm_factory(<span class="string">"glm-4-plus"</span>, client=client)
+
+<span class="comment"># Embeddings — 智谱 embedding-3</span>
+emb = OpenAIEmbeddings(
+    model=<span class="string">"embedding-3"</span>,
+    api_key=os.environ[<span class="string">"ZHIPU_API_KEY"</span>],
+    base_url=<span class="string">"https://open.bigmodel.cn/api/paas/v4"</span>,
+)
+embeddings = LangchainEmbeddingsWrapper(embeddings=emb)
+
+<span class="comment"># 评估</span>
+scorer = ResponseRelevancy(llm=llm, embeddings=embeddings, strictness=1)
+sample = SingleTurnSample(
+    user_input=<span class="string">"Python 的列表推导式是什么？"</span>,
+    response=<span class="string">"列表推导式是从已有列表创建新列表的简洁语法..."</span>,
+)
+score = <span class="keyword">await</span> scorer.single_turn_ascore(sample)</pre>
+    </div>
+  </div>
+
+  <div class="step open">
+    <div class="step-head">
+      <div class="step-num done">3</div>
+      <span class="step-title">运行结果</span>
+      <span class="step-arrow">&#9654;</span>
+    </div>
+    <div class="step-body">
+      <div class="output">相关答案（切题）:   0.8739
+不相关答案（答非所问）: 0.4567
+
+验证通过: 相关答案得分 &gt; 不相关答案</div>
+      <div class="callout callout-info">
+        <span class="callout-icon">&#128218;</span>
+        <div><strong>注意：</strong>分数不是 1.0 vs 0.0，因为语义相似度是连续值。0.87 已经是很高的相关性，0.46 表示明显不相关但仍有语义重叠。</div>
+      </div>
+    </div>
   </div>
 </div>
 

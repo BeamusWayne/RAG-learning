@@ -58,14 +58,19 @@
       "area": "metrics",
       "title": "Answer Relevancy（答案相关性）学习 demo",
       "user_visible_behavior": "运行 demo_answer_relevancy.py，输入 question + answer，输出 answer_relevancy 分数。包含相关答案和不相关答案两个对比用例。",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "cd Projects/RAGAS-Learning && python demos/demo_answer_relevancy.py",
         "确认输出两个用例的 answer_relevancy 分数。",
         "确认相关答案得分 > 不相关答案。"
       ],
-      "evidence": [],
-      "notes": "Answer Relevancy 衡量答案与问题的相关程度。"
+      "evidence": [
+        "相关答案得分 0.8739",
+        "不相关答案得分 0.4567",
+        "LLM 使用 glm-4-plus（flash 生成的反向问题质量不足）",
+        "Embedding 使用智谱 embedding-3"
+      ],
+      "notes": "Answer Relevancy 需要 LLM + Embeddings 两部分。LLM 用于反向生成问题，Embeddings 用于计算语义相似度。glm-4-flash 的反向问题生成质量不足，需 glm-4-plus。"
     },
     {
       "id": "ragas-004",
