@@ -97,14 +97,18 @@
       "area": "metrics",
       "title": "Context Recall（上下文召回）学习 demo",
       "user_visible_behavior": "运行 demo_context_recall.py，输入 question + contexts + ground_truth，输出 context_recall 分数。展示完整召回 vs 遗漏信息的对比。",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "cd Projects/RAGAS-Learning && python demos/demo_context_recall.py",
         "确认输出两个用例的 context_recall 分数。",
         "确认完整召回的用例得分更高。"
       ],
-      "evidence": [],
-      "notes": "Context Recall 衡量 ground_truth 中的信息是否都被检索到了。"
+      "evidence": [
+        "高召回（完整覆盖）得分 1.0000",
+        "低召回（遗漏诺贝尔奖）得分 0.5000",
+        "使用 glm-4-plus 作为评估 LLM"
+      ],
+      "notes": "Context Recall 将 reference 拆分为陈述，判断每个陈述是否被上下文覆盖。只需 LLM，不需要 Embeddings。"
     },
     {
       "id": "ragas-006",

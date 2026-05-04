@@ -340,7 +340,7 @@
     </div>
     <div class="nav-item" data-ch="ch5">
       <span>05 Context Recall</span>
-      <span class="badge badge-pending">TODO</span>
+      <span class="badge badge-passing">PASS</span>
     </div>
   </div>
   <div class="nav-section">
@@ -721,12 +721,66 @@ score = <span class="keyword">await</span> scorer.single_turn_ascore(sample_high
   <div class="chapter-header">
     <h2>05 Context Recall（上下文召回）</h2>
     <span class="tag tag-metrics">METRICS</span>
-    <span class="badge badge-pending" style="font-size:12px;padding:3px 10px;">TODO</span>
+    <span class="badge badge-passing" style="font-size:12px;padding:3px 10px;">PASSING</span>
     <p class="desc">Context Recall 衡量标准答案（ground truth）中的信息是否都被检索到的上下文覆盖。遗漏关键信息会扣分。</p>
   </div>
-  <div class="callout callout-info">
-    <span class="callout-icon">&#128640;</span>
-    <div>本章节将在 ragas-005 阶段完成。</div>
+
+  <div class="step open">
+    <div class="step-head">
+      <div class="step-num done">1</div>
+      <span class="step-title">核心原理</span>
+      <span class="step-arrow">&#9654;</span>
+    </div>
+    <div class="step-body">
+      <p>Context Recall 的视角和 Precision 相反：它不关心检索到了多少不相关的，而是关心<strong>该检索到的都检索到了吗？</strong></p>
+      <p>LLM 将 reference 拆分为多条陈述，然后逐条判断每条陈述是否能从上下文中找到支持。覆盖率 = 被支持的陈述数 / 总陈述数。</p>
+      <div class="callout callout-info">
+        <span class="callout-icon">&#128218;</span>
+        <div>Precision vs Recall：<br>Precision = 检索到的有多准？（关注误检）<br>Recall = 该检索到的都检索到了吗？（关注漏检）</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step open">
+    <div class="step-head">
+      <div class="step-num done">2</div>
+      <span class="step-title">完整源码</span>
+      <span class="step-arrow">&#9654;</span>
+    </div>
+    <div class="step-body">
+      <pre><span class="keyword">from</span> ragas.metrics._context_recall <span class="keyword">import</span> ContextRecall
+
+sample = SingleTurnSample(
+    user_input=<span class="string">"爱因斯坦有哪些重要贡献？"</span>,
+    reference=<span class="string">"爱因斯坦提出了狭义和广义相对论，"
+              "并因光电效应获得诺贝尔奖。"</span>,
+    retrieved_contexts=[
+        <span class="string">"爱因斯坦于1905年提出狭义相对论..."</span>,
+        <span class="string">"爱因斯坦因光电效应获得1921年诺贝尔奖。"</span>,
+    ],
+)
+scorer = ContextRecall(llm=llm)
+score = <span class="keyword">await</span> scorer.single_turn_ascore(sample)
+<span class="comment"># score = 1.0（全部覆盖）</span></pre>
+    </div>
+  </div>
+
+  <div class="step open">
+    <div class="step-head">
+      <div class="step-num done">3</div>
+      <span class="step-title">运行结果</span>
+      <span class="step-arrow">&#9654;</span>
+    </div>
+    <div class="step-body">
+      <div class="output">高召回（完整覆盖）: 1.0000
+低召回（遗漏诺贝尔奖）: 0.5000
+
+验证通过: 完整召回的用例得分更高</div>
+      <div class="callout callout-success">
+        <span class="callout-icon">&#9989;</span>
+        <div><strong>ragas-005 验证通过！</strong>完整覆盖得分 1.0。遗漏诺贝尔奖信息时，reference 中 2 条陈述只有 1 条被覆盖，得分 0.5。</div>
+      </div>
+    </div>
   </div>
 </div>
 

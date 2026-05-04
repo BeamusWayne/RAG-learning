@@ -6,7 +6,7 @@
 - 子项目目录：`Projects/RAGAS-Learning/`
 - 标准启动路径：`cd Projects/RAGAS-Learning && ./init.sh`
 - 标准验证路径：`cd Projects/RAGAS-Learning && python -c "import ragas; print(ragas.__version__)"`
-- 当前最高优先级未完成功能：ragas-005 — Context Recall（上下文召回）学习 demo
+- 当前最高优先级未完成功能：ragas-006 — evaluate() 综合评估 demo
 - 当前 blocker：无
 
 ## 会话记录
