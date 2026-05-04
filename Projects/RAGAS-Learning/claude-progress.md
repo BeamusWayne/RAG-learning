@@ -6,10 +6,27 @@
 - 子项目目录：`Projects/RAGAS-Learning/`
 - 标准启动路径：`cd Projects/RAGAS-Learning && ./init.sh`
 - 标准验证路径：`cd Projects/RAGAS-Learning && python -c "import ragas; print(ragas.__version__)"`
-- 当前最高优先级未完成功能：ragas-002 — Faithfulness（忠实度）学习 demo
+- 当前最高优先级未完成功能：ragas-003 — Answer Relevancy（答案相关性）学习 demo
 - 当前 blocker：无
 
 ## 会话记录
+
+### Session 003 — 2026-05-04
+
+- 日期：2026-05-04
+- 本轮目标：完成 ragas-002 Faithfulness demo
+- 已完成：ragas-002 验证通过（高忠实度 1.0000，低忠实度 0.0000）
+- 运行过的验证：`python demos/demo_faithfulness.py` 使用智谱 GLM-4-flash
+- 已记录证据：feature_list.json ragas-002 evidence 已填充
+- 关键发现：
+  1. RAGAS 0.4.3 使用 `SingleTurnSample` + `Faithfulness(llm=llm)` + `scorer.single_turn_ascore(sample)` API
+  2. 必须显式传入 `llm_factory(model, client=OpenAI(...))` ，不会自动从环境变量创建 LLM
+  3. 推理模型（MiniMax-M2/M2.7、GLM-5.1）的思考输出破坏 instructor 的 JSON 解析，必须用非推理模型
+  4. 智谱 glm-4-flash 兼容 OpenAI 协议，可用于 RAGAS 评估
+- 目录整理：demo 移入 demos/，文档移入 docs/
+- .env 更新：添加智谱 AI 配置（ZHIPU_API_KEY/BASE_URL/CHAT_MODEL）
+- 更新过的文件：demo_faithfulness.py, .env, feature_list.json, claude-progress.md
+- 下一步最佳动作：ragas-003 Answer Relevancy demo
 
 ### Session 002 — 2026-05-04
 

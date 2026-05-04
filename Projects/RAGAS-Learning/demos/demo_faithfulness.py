@@ -22,10 +22,14 @@ from ragas.dataset_schema import SingleTurnSample
 from ragas.llms import llm_factory
 from ragas.metrics._faithfulness import Faithfulness
 
-load_dotenv(os.path.join(os.path.dirname(__file__), "..", "..", ".env"))
+load_dotenv(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".env"))
 
-if not os.environ.get("OPENAI_API_KEY"):
-    print("错误: 未找到 OPENAI_API_KEY，请在仓库根目录 .env 中设置")
+ZHIPU_API_KEY = os.environ.get("ZHIPU_API_KEY", "")
+ZHIPU_BASE_URL = os.environ.get("ZHIPU_BASE_URL", "https://open.bigmodel.cn/api/paas/v4")
+ZHIPU_CHAT_MODEL = os.environ.get("ZHIPU_CHAT_MODEL", "glm-4-flash")
+
+if not ZHIPU_API_KEY:
+    print("错误: 未找到 ZHIPU_API_KEY，请在仓库根目录 .env 中设置")
     sys.exit(1)
 
 
@@ -57,7 +61,10 @@ async def main():
     print("RAGAS Faithfulness（忠实度）评估 Demo")
     print("=" * 60)
 
-    llm = llm_factory("gpt-4o-mini", client=OpenAI())
+    print(f"使用模型: {ZHIPU_CHAT_MODEL} ({ZHIPU_BASE_URL})")
+
+    client = OpenAI(api_key=ZHIPU_API_KEY, base_url=ZHIPU_BASE_URL)
+    llm = llm_factory(ZHIPU_CHAT_MODEL, client=client)
 
     # 用例 1: 高忠实度 — 答案完全基于上下文
     score_high = await evaluate_faithfulness(

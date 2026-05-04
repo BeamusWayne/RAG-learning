@@ -39,14 +39,18 @@
       "area": "metrics",
       "title": "Faithfulness（忠实度）学习 demo",
       "user_visible_behavior": "运行 demo_faithfulness.py，输入 question + answer + contexts，输出 faithfulness 分数。包含高 Faithfulness 和低 Faithfulness（幻觉）两个对比用例。",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "cd Projects/RAGAS-Learning && python demos/demo_faithfulness.py",
         "确认输出两个用例的 faithfulness 分数。",
         "确认高 Faithfulness 用例得分 > 低 Faithfulness 用例。"
       ],
-      "evidence": [],
-      "notes": "Faithfulness 衡量答案是否忠实于检索上下文，是检测幻觉的核心指标。"
+      "evidence": [
+        "高忠实度用例得分 1.0000（答案完全基于上下文）",
+        "低忠实度用例得分 0.0000（包含幻觉信息）",
+        "使用智谱 GLM-4-flash 作为评估 LLM"
+      ],
+      "notes": "Faithfulness 衡量答案是否忠实于检索上下文，是检测幻觉的核心指标。推理模型（MiniMax-M2/M2.7/GLM-5.1）的思考输出会破坏 JSON 解析，必须使用非推理模型如 glm-4-flash。"
     },
     {
       "id": "ragas-003",

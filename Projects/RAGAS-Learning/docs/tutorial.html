@@ -328,7 +328,7 @@
     <div class="nav-section-title">核心指标</div>
     <div class="nav-item" data-ch="ch2">
       <span>02 Faithfulness 忠实度</span>
-      <span class="badge badge-pending">TODO</span>
+      <span class="badge badge-passing">PASS</span>
     </div>
     <div class="nav-item" data-ch="ch3">
       <span>03 Answer Relevancy</span>
@@ -493,12 +493,74 @@ PYEOF</pre>
   <div class="chapter-header">
     <h2>02 Faithfulness（忠实度）</h2>
     <span class="tag tag-metrics">METRICS</span>
-    <span class="badge badge-pending" style="font-size:12px;padding:3px 10px;">TODO</span>
+    <span class="badge badge-passing" style="font-size:12px;padding:3px 10px;">PASSING</span>
     <p class="desc">Faithfulness 衡量模型生成的答案是否忠实于检索到的上下文，是检测幻觉（Hallucination）的核心指标。</p>
   </div>
-  <div class="callout callout-info">
-    <span class="callout-icon">&#128640;</span>
-    <div>本章节将在 ragas-002 阶段完成。届时会包含完整的 demo 代码、高低忠实度对比用例和运行结果。</div>
+
+  <div class="step open">
+    <div class="step-head">
+      <div class="step-num done">1</div>
+      <span class="step-title">RAGAS 0.4.3 API 调用方式</span>
+      <span class="step-arrow">&#9654;</span>
+    </div>
+    <div class="step-body">
+      <p>RAGAS 0.4.x 使用 <code class="inline-code">SingleTurnSample</code> 封装输入，通过 <code class="inline-code">single_turn_ascore()</code> 异步评估：</p>
+      <pre><span class="keyword">from</span> ragas.dataset_schema <span class="keyword">import</span> SingleTurnSample
+<span class="keyword">from</span> ragas.metrics._faithfulness <span class="keyword">import</span> Faithfulness
+
+sample = SingleTurnSample(
+    user_input=<span class="string">"问题"</span>,
+    response=<span class="string">"答案"</span>,
+    retrieved_contexts=[<span class="string">"上下文1"</span>],
+)
+scorer = Faithfulness(llm=llm)
+score = <span class="keyword">await</span> scorer.single_turn_ascore(sample)</pre>
+      <div class="callout callout-warn">
+        <span class="callout-icon">&#9888;&#65039;</span>
+        <div><strong>必须显式传入 LLM：</strong>RAGAS 0.4.3 不会自动从环境变量创建 LLM。需要 <code class="inline-code">llm_factory(model, client=OpenAI(...))</code> 手动创建。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step open">
+    <div class="step-head">
+      <div class="step-num done">2</div>
+      <span class="step-title">选择评估用 LLM（关键）</span>
+      <span class="step-arrow">&#9654;</span>
+    </div>
+    <div class="step-body">
+      <p>RAGAS 通过 instructor 库要求 LLM 返回<strong>纯净 JSON</strong>。推理模型（带思考过程）会导致解析失败。</p>
+      <div class="callout callout-warn">
+        <span class="callout-icon">&#9888;&#65039;</span>
+        <div><strong>不可用：</strong>MiniMax-M2/M2.7、GLM-5.1 等推理模型。思考标签破坏 JSON 解析。<br><strong>可用：</strong>glm-4-flash、glm-4-plus、gpt-4o-mini 等非推理模型。</div>
+      </div>
+      <pre><span class="keyword">from</span> openai <span class="keyword">import</span> OpenAI
+<span class="keyword">from</span> ragas.llms <span class="keyword">import</span> llm_factory
+
+client = OpenAI(
+    api_key=<span class="string">"your-key"</span>,
+    base_url=<span class="string">"https://open.bigmodel.cn/api/paas/v4"</span>,
+)
+llm = llm_factory(<span class="string">"glm-4-flash"</span>, client=client)</pre>
+    </div>
+  </div>
+
+  <div class="step open">
+    <div class="step-head">
+      <div class="step-num done">3</div>
+      <span class="step-title">运行结果</span>
+      <span class="step-arrow">&#9654;</span>
+    </div>
+    <div class="step-body">
+      <div class="output">高忠实度（答案基于上下文）: 1.0000
+低忠实度（包含幻觉）:     0.0000
+
+验证通过: 高忠实度得分 &gt; 低忠实度得分</div>
+      <div class="callout callout-success">
+        <span class="callout-icon">&#9989;</span>
+        <div><strong>ragas-002 验证通过！</strong>基于上下文的答案得分 1.0，编造幻觉的答案得分 0.0。</div>
+      </div>
+    </div>
   </div>
 </div>
 
