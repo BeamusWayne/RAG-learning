@@ -357,7 +357,7 @@
     </div>
     <div class="nav-item" data-ch="ch8">
       <span>08 Naive vs Reranked 对比</span>
-      <span class="badge badge-pending">TODO</span>
+      <span class="badge badge-passing">PASS</span>
     </div>
   </div>
 </nav>
@@ -1016,12 +1016,85 @@ Generating Samples:   6/6 完成
   <div class="chapter-header">
     <h2>08 Naive RAG vs Reranked RAG 对比</h2>
     <span class="tag tag-integration">INTEGRATION</span>
-    <span class="badge badge-pending" style="font-size:12px;padding:3px 10px;">TODO</span>
+    <span class="badge badge-passing" style="font-size:12px;padding:3px 10px;">PASSING</span>
     <p class="desc">综合实战：对同一批问题分别用 naive retrieval 和 reranked retrieval 生成答案，用 RAGAS 量化改进效果。</p>
   </div>
-  <div class="callout callout-info">
-    <span class="callout-icon">&#128640;</span>
-    <div>本章节将在 ragas-008 阶段完成。依赖仓库 RAG-Primer 的知识。</div>
+
+  <div class="step open">
+    <div class="step-head">
+      <div class="step-num done">1</div>
+      <span class="step-title">核心原理</span>
+      <span class="step-arrow">&#9654;</span>
+    </div>
+    <div class="step-body">
+      <p>这是 RAGAS 学习的最终实战。我们构建一个完整的 RAG pipeline，对比两种检索策略：</p>
+      <p><strong>Naive RAG：</strong>用向量相似度直接 top-2 检索</p>
+      <p><strong>Reranked RAG：</strong>先 top-5 召回候选，再用 LLM 对每个候选打分重排序，取 top-2</p>
+      <p>然后用 RAGAS evaluate() 同时评估两种策略的 4 个维度，量化 Reranking 带来的改进。</p>
+      <div class="callout callout-info">
+        <span class="callout-icon">&#128161;</span>
+        <div>完整 pipeline：文档 → 向量化 → 检索/重排序 → LLM 生成答案 → RAGAS 评估对比</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step open">
+    <div class="step-head">
+      <div class="step-num done">2</div>
+      <span class="step-title">完整源码（关键片段）</span>
+      <span class="step-arrow">&#9654;</span>
+    </div>
+    <div class="step-body">
+      <pre><span class="comment"># 知识库向量化</span>
+doc_embeddings = embed_model.embed_documents(KNOWLEDGE_BASE)
+query_emb = embed_model.embed_query(question)
+
+<span class="comment"># Naive: 直接 top-k 向量检索</span>
+naive_indices = naive_retrieve(query_emb, doc_embeddings, top_k=<span class="num">2</span>)
+
+<span class="comment"># Reranked: 先多召回，再 LLM 重排序</span>
+candidates = naive_retrieve(query_emb, doc_embeddings, top_k=<span class="num">5</span>)
+reranked_indices = rerank_with_llm(
+    client, question, KNOWLEDGE_BASE, candidates, top_k=<span class="num">2</span>
+)
+
+<span class="comment"># 用检索到的上下文生成答案</span>
+answer = generate_answer(client, question, contexts)
+
+<span class="comment"># 构建样本并批量评估</span>
+naive_result = evaluate(dataset=naive_dataset, metrics=metrics, ...)
+reranked_result = evaluate(dataset=reranked_dataset, metrics=metrics, ...)
+
+<span class="comment"># 对比输出</span>
+<span class="keyword">for</span> col <span class="keyword">in</span> metric_cols:
+    diff = reranked_avg - naive_avg
+    print(f<span class="string">"{col}: {naive:.4f} → {reranked:.4f} ({diff:+.4f})"</span>)</pre>
+    </div>
+  </div>
+
+  <div class="step open">
+    <div class="step-head">
+      <div class="step-num done">3</div>
+      <span class="step-title">运行结果</span>
+      <span class="step-arrow">&#9654;</span>
+    </div>
+    <div class="step-body">
+      <div class="output">对比评估结果
+────────────────────────────────────────────────
+指标                     Naive RAG  Reranked RAG      差异
+────────────────────────────────────────────────────────
+faithfulness               1.0000       1.0000   0.0000
+answer_relevancy           0.6593       0.6593   0.0000
+context_precision          0.6667       0.6667   0.0000
+context_recall             0.5556       0.7222  +0.1667
+
+Context Precision: Naive=0.6667, Reranked=0.6667
+验证通过: Reranked RAG 在 context_precision 上得分 >= Naive RAG</div>
+      <div class="callout callout-success">
+        <span class="callout-icon">&#9989;</span>
+        <div><strong>ragas-008 验证通过！全部 8 个功能完成！</strong>Reranked RAG 在 context_recall 上提升了 +0.17（爱因斯坦问题多召回了一条狭义相对论的上下文）。faithfulness 和 context_precision 保持持平。小知识库（10 条）中两种策略差异不大，更大的知识库会放大 reranking 的优势。</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1094,10 +1167,12 @@ const sidebarData = {
   },
   ch8: {
     points: [
-      { title: "Reranking 原理", body: "先用 BM25/向量检索召回候选文档，再用交叉编码器（cross-encoder）对 query-document 对重排序，提升相关性。", dot: "dot-purple" },
-      { title: "预期结论", body: "Reranked RAG 在 Context Precision 上应显著高于 Naive RAG。Faithfulness 和 Context Recall 也可能提升。", dot: "dot-green" }
+      { title: "Reranking 原理", body: "先向量检索召回 top-N 候选（N 较大），再用 LLM 对每个候选与 query 的相关性打分，按分数重排序取 top-K。比纯向量检索更精准。", dot: "dot-purple" },
+      { title: "LLM Reranker 要点", body: "用 glm-4-flash 给每个片段打 1-10 分。需要稳健的输出解析：strip 前缀（段落/片段/[]），fallback 到原始排序。", dot: "dot-orange" },
+      { title: "对比结论", body: "小知识库（10条）中两种策略差异不大。Reranked 在 context_recall 上提升 +0.17。更大知识库会放大 reranking 优势。", dot: "dot-green" },
+      { title: "完整 Pipeline", body: "文档 → embed_documents() 向量化 → query embed → naive/reranked 检索 → generate_answer() → RAGAS evaluate() 对比。这是真实 RAG 系统评估的最小完整示例。", dot: "dot-blue" }
     ],
-    related: ["RAGAS 对比评估教程", "Cohere Rerank / BGE Reranker"]
+    related: ["RAGAS 对比评估教程", "Cohere Rerank / BGE Reranker", "向量数据库对比：FAISS vs Chroma vs Milvus"]
   }
 };
 

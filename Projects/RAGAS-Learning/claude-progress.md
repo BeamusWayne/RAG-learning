@@ -6,7 +6,7 @@
 - 子项目目录：`Projects/RAGAS-Learning/`
 - 标准启动路径：`cd Projects/RAGAS-Learning && ./init.sh`
 - 标准验证路径：`cd Projects/RAGAS-Learning && python -c "import ragas; print(ragas.__version__)"`
-- 当前最高优先级未完成功能：ragas-008 — 对比评估 Naive RAG vs Reranked RAG
+- 当前最高优先级未完成功能：全部 8 个功能已完成
 - 当前 blocker：无
 
 ## 会话记录
@@ -47,6 +47,21 @@
 - 修复：延伸阅读改为纯文本标签（原来看起来像链接但不可点击）
 - 更新过的文件：demo_evaluate.py, demo_testset_generator.py, feature_list.json, tutorial.html, claude-progress.md
 - 下一步最佳动作：ragas-008 对比评估 Naive RAG vs Reranked RAG
+
+### Session 007 — 2026-05-04
+
+- 日期：2026-05-04
+- 本轮目标：完成 ragas-008 对比评估
+- 已完成：ragas-008 验证通过（全部 8 个功能已完成！）
+- 运行过的验证：`uv run python demos/demo_rag_comparison.py`
+- 已记录证据：feature_list.json ragas-008 evidence 已填充
+- 关键发现：
+  1. LLM reranker 的输出需要稳健解析（strip 段落/片段/[] 前缀，fallback 到原始排序）
+  2. 小知识库中 naive 和 reranked 差异不大，但 reranked 在 context_recall 上提升 +0.17
+  3. 完整 pipeline：文档向量化 → 两种检索策略 → LLM 生成答案 → RAGAS evaluate() 对比
+- 修复：延伸阅读从假链接改为纯文本标签
+- 更新过的文件：demo_rag_comparison.py, feature_list.json, tutorial.html, claude-progress.md
+- 下一步最佳动作：项目完成，可考虑扩展（如更多文档、不同 reranker、可视化报告）
 
 - 日期：2026-05-04
 - 本轮目标：完成 ragas-003 Answer Relevancy demo
