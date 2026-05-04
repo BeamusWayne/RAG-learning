@@ -41,7 +41,7 @@
       "user_visible_behavior": "运行 demo_faithfulness.py，输入 question + answer + contexts，输出 faithfulness 分数。包含高 Faithfulness 和低 Faithfulness（幻觉）两个对比用例。",
       "status": "not_started",
       "verification": [
-        "cd Projects/RAGAS-Learning && python demo_faithfulness.py",
+        "cd Projects/RAGAS-Learning && python demos/demo_faithfulness.py",
         "确认输出两个用例的 faithfulness 分数。",
         "确认高 Faithfulness 用例得分 > 低 Faithfulness 用例。"
       ],
@@ -56,7 +56,7 @@
       "user_visible_behavior": "运行 demo_answer_relevancy.py，输入 question + answer，输出 answer_relevancy 分数。包含相关答案和不相关答案两个对比用例。",
       "status": "not_started",
       "verification": [
-        "cd Projects/RAGAS-Learning && python demo_answer_relevancy.py",
+        "cd Projects/RAGAS-Learning && python demos/demo_answer_relevancy.py",
         "确认输出两个用例的 answer_relevancy 分数。",
         "确认相关答案得分 > 不相关答案。"
       ],
@@ -71,7 +71,7 @@
       "user_visible_behavior": "运行 demo_context_precision.py，输入 question + contexts + ground_truth，输出 context_precision 分数。展示相关上下文排名靠前 vs 靠后的对比。",
       "status": "not_started",
       "verification": [
-        "cd Projects/RAGAS-Learning && python demo_context_precision.py",
+        "cd Projects/RAGAS-Learning && python demos/demo_context_precision.py",
         "确认输出两个用例的 context_precision 分数。",
         "确认相关上下文排名靠前的用例得分更高。"
       ],
@@ -86,7 +86,7 @@
       "user_visible_behavior": "运行 demo_context_recall.py，输入 question + contexts + ground_truth，输出 context_recall 分数。展示完整召回 vs 遗漏信息的对比。",
       "status": "not_started",
       "verification": [
-        "cd Projects/RAGAS-Learning && python demo_context_recall.py",
+        "cd Projects/RAGAS-Learning && python demos/demo_context_recall.py",
         "确认输出两个用例的 context_recall 分数。",
         "确认完整召回的用例得分更高。"
       ],
@@ -101,7 +101,7 @@
       "user_visible_behavior": "运行 demo_evaluate.py，传入含多个样本的 Dataset，同时跑全部 4 个指标，输出综合评估结果表格。",
       "status": "not_started",
       "verification": [
-        "cd Projects/RAGAS-Learning && python demo_evaluate.py",
+        "cd Projects/RAGAS-Learning && python demos/demo_evaluate.py",
         "确认输出包含 faithfulness, answer_relevancy, context_precision, context_recall 四列。",
         "确认至少有 3 个样本的评估结果。"
       ],
@@ -116,7 +116,7 @@
       "user_visible_behavior": "运行 demo_testset_generator.py，输入文档，自动生成 question-answer-contexts 测试集。",
       "status": "not_started",
       "verification": [
-        "cd Projects/RAGAS-Learning && python demo_testset_generator.py",
+        "cd Projects/RAGAS-Learning && python demos/demo_testset_generator.py",
         "确认输出包含自动生成的 question, answer, contexts 字段。",
         "确认生成至少 3 条测试样本。"
       ],
@@ -131,7 +131,7 @@
       "user_visible_behavior": "运行 demo_rag_comparison.py，对同一批问题分别用 naive retrieval 和 reranked retrieval 生成答案，用 RAGAS 评估两者差异并输出对比表格。",
       "status": "not_started",
       "verification": [
-        "cd Projects/RAGAS-Learning && python demo_rag_comparison.py",
+        "cd Projects/RAGAS-Learning && python demos/demo_rag_comparison.py",
         "确认输出两种策略的 4 维评估分数对比表。",
         "确认 reranked 版本在 context_precision 上得分更高。"
       ],

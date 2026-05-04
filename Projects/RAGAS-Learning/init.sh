@@ -59,5 +59,6 @@ PYEOF
 
 echo ""
 echo "==> 初始化完成"
-echo "    运行 demo: python demo_faithfulness.py"
-echo "    综合评估: python demo_evaluate.py"
+echo "    运行 demo: python demos/demo_faithfulness.py"
+echo "    综合评估: python demos/demo_evaluate.py"
+echo "    教程网页: open docs/tutorial.html"
