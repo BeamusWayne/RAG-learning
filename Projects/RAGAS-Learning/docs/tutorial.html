@@ -347,7 +347,7 @@
     <div class="nav-section-title">综合应用</div>
     <div class="nav-item" data-ch="ch6">
       <span>06 evaluate() 综合评估</span>
-      <span class="badge badge-pending">TODO</span>
+      <span class="badge badge-passing">PASS</span>
     </div>
     <div class="nav-item" data-ch="ch7">
       <span>07 合成测试数据集生成</span>
@@ -788,12 +788,101 @@ score = <span class="keyword">await</span> scorer.single_turn_ascore(sample)
   <div class="chapter-header">
     <h2>06 evaluate() 综合评估</h2>
     <span class="tag tag-pipeline">PIPELINE</span>
-    <span class="badge badge-pending" style="font-size:12px;padding:3px 10px;">TODO</span>
+    <span class="badge badge-passing" style="font-size:12px;padding:3px 10px;">PASSING</span>
     <p class="desc">使用 <code class="inline-code">ragas.evaluate()</code> 对多个样本同时跑全部 4 个指标，输出综合评估结果表格。</p>
   </div>
-  <div class="callout callout-info">
-    <span class="callout-icon">&#128640;</span>
-    <div>本章节将在 ragas-006 阶段完成。</div>
+
+  <div class="step open">
+    <div class="step-head">
+      <div class="step-num done">1</div>
+      <span class="step-title">核心原理</span>
+      <span class="step-arrow">&#9654;</span>
+    </div>
+    <div class="step-body">
+      <p>前面的 demo 都是逐个样本、逐个指标地评估。实际项目中，我们需要<strong>批量评估多个样本的多个指标</strong>，<code class="inline-code">ragas.evaluate()</code> 就是为此设计的。</p>
+      <p>它接受一个 <code class="inline-code">EvaluationDataset</code>（包含多个 <code class="inline-code">SingleTurnSample</code>）和一个 metrics 列表，一次性完成所有评估，返回包含所有分数的结果表格。</p>
+      <div class="callout callout-info">
+        <span class="callout-icon">&#128161;</span>
+        <div><strong>关键区别：</strong>前面的 demo 用 <code class="inline-code">scorer.single_turn_ascore()</code>（异步），evaluate() 是<strong>同步函数</strong>，直接调用不需要 await。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step open">
+    <div class="step-head">
+      <div class="step-num done">2</div>
+      <span class="step-title">完整源码</span>
+      <span class="step-arrow">&#9654;</span>
+    </div>
+    <div class="step-body">
+      <pre><span class="keyword">from</span> ragas <span class="keyword">import</span> evaluate
+<span class="keyword">from</span> ragas.dataset_schema <span class="keyword">import</span> EvaluationDataset, SingleTurnSample
+<span class="keyword">from</span> ragas.metrics._faithfulness <span class="keyword">import</span> Faithfulness
+<span class="keyword">from</span> ragas.metrics._answer_relevance <span class="keyword">import</span> ResponseRelevancy
+<span class="keyword">from</span> ragas.metrics._context_precision <span class="keyword">import</span> ContextPrecision
+<span class="keyword">from</span> ragas.metrics._context_recall <span class="keyword">import</span> ContextRecall
+<span class="keyword">from</span> ragas.embeddings <span class="keyword">import</span> LangchainEmbeddingsWrapper
+
+<span class="comment"># 定义指标</span>
+metrics = [
+    Faithfulness(llm=llm),
+    ResponseRelevancy(llm=llm, embeddings=embeddings, strictness=<span class="num">1</span>),
+    ContextPrecision(llm=llm),
+    ContextRecall(llm=llm),
+]
+
+<span class="comment"># 构建数据集（3 个样本）</span>
+samples = [
+    SingleTurnSample(
+        user_input=<span class="string">"爱因斯坦有哪些重要贡献？"</span>,
+        response=<span class="string">"爱因斯坦提出了狭义和广义相对论..."</span>,
+        reference=<span class="string">"爱因斯坦提出了狭义和广义相对论..."</span>,
+        retrieved_contexts=[<span class="string">"..."</span>, <span class="string">"..."</span>],
+    ),
+    <span class="comment"># ... 更多样本</span>
+]
+dataset = EvaluationDataset(samples=samples)
+
+<span class="comment"># 批量评估（同步函数，不需要 await）</span>
+result = evaluate(
+    dataset=dataset,
+    metrics=metrics,
+    llm=llm,
+    embeddings=embeddings,
+    show_progress=<span class="keyword">True</span>,
+)
+
+df = result.to_pandas()
+print(df.to_string(index=<span class="keyword">False</span>))</pre>
+    </div>
+  </div>
+
+  <div class="step open">
+    <div class="step-head">
+      <div class="step-num done">3</div>
+      <span class="step-title">运行结果</span>
+      <span class="step-arrow">&#9654;</span>
+    </div>
+    <div class="step-body">
+      <div class="output">Evaluating: 100%|██████████| 12/12 [00:47&lt;00:00,  3.95s/it]
+
+综合评估结果（3 个样本 × 4 个指标）:
+────────────────────────────────────────
+              faithfulness  answer_relevancy  context_precision  context_recall
+爱因斯坦        1.000000          0.449876           1.000000             1.0
+量子力学        0.750000          0.901124           0.583333             0.5
+光合作用        0.666667          0.826652           1.000000             0.0
+
+各指标平均分:
+  faithfulness:       0.8056
+  answer_relevancy:   0.7259
+  context_precision:  0.8611
+  context_recall:     0.5000</div>
+      <div class="callout callout-success">
+        <span class="callout-icon">&#9989;</span>
+        <div><strong>ragas-006 验证通过！</strong>3 个样本全部评估完成，4 个指标全部有分数输出。光合作用样本 context_recall 为 0（上下文只有光反应，reference 包含暗反应），符合预期。</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -873,10 +962,13 @@ const sidebarData = {
   },
   ch6: {
     points: [
-      { title: "evaluate() 函数", body: "RAGAS 的核心入口函数。接收 Dataset + metrics 列表，批量评估所有样本，返回综合结果。", dot: "dot-purple" },
-      { title: "Dataset 格式", body: "需要的列：user_input（问题）、response（答案）、retrieved_contexts（检索上下文）、reference（标准答案）。具体列取决于用了哪些指标。", dot: "dot-blue" }
+      { title: "evaluate() 函数", body: "RAGAS 的核心入口函数。接收 EvaluationDataset + metrics 列表，批量评估所有样本，返回 EvaluationResult。注意：它是同步函数，不需要 await。", dot: "dot-purple" },
+      { title: "EvaluationDataset", body: "由多个 SingleTurnSample 组成。每个样本需要 user_input + response + retrieved_contexts + reference。具体需要哪些字段取决于用了哪些指标。", dot: "dot-blue" },
+      { title: "结果输出", body: "result.to_pandas() 返回 DataFrame，每行一个样本，每列一个指标。可以直接 print、导出 CSV 或进一步分析。", dot: "dot-green" },
+      { title: "进度显示", body: "show_progress=True 会显示 tqdm 进度条。3 个样本 × 4 个指标 = 12 个评估任务，实际运行约 1 分钟。", dot: "dot-orange" },
+      { title: "光合作用案例", body: "context_recall = 0 是因为上下文只提到光反应，但 reference 包含了暗反应（Calvin 循环）。缺少关键信息的上下文被正确检测。", dot: "dot-pink" }
     ],
-    related: ["RAGAS evaluate() API 文档", "HuggingFace Datasets 使用指南"]
+    related: ["RAGAS evaluate() API 文档", "HuggingFace Datasets 使用指南", "EvaluationResult.to_pandas() 方法"]
   },
   ch7: {
     points: [

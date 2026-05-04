@@ -116,14 +116,20 @@
       "area": "pipeline",
       "title": "端到端 evaluate() 综合评估 demo",
       "user_visible_behavior": "运行 demo_evaluate.py，传入含多个样本的 Dataset，同时跑全部 4 个指标，输出综合评估结果表格。",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
-        "cd Projects/RAGAS-Learning && python demos/demo_evaluate.py",
+        "cd Projects/RAGAS-Learning && uv run python demos/demo_evaluate.py",
         "确认输出包含 faithfulness, answer_relevancy, context_precision, context_recall 四列。",
         "确认至少有 3 个样本的评估结果。"
       ],
-      "evidence": [],
-      "notes": "综合使用 ragas.evaluate() 和 HuggingFace Dataset 进行批量评估。"
+      "evidence": [
+        "3 个样本全部评估完成（爱因斯坦/量子力学/光合作用）",
+        "faithfulness 平均 0.8056，answer_relevancy 平均 0.7259",
+        "context_precision 平均 0.8611，context_recall 平均 0.5000",
+        "使用 glm-4-plus 作为评估 LLM，embedding-3 作为 Embeddings",
+        "evaluate() 是同步函数，不需要 await"
+      ],
+      "notes": "evaluate() 接受 EvaluationDataset + metrics 列表 + llm + embeddings，返回 EvaluationResult（可 .to_pandas()）。注意：evaluate() 是同步函数不是协程。LangchainEmbeddingsWrapper 已废弃但当前仍可用。"
     },
     {
       "id": "ragas-007",

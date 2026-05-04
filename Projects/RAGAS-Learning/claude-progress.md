@@ -6,12 +6,26 @@
 - 子项目目录：`Projects/RAGAS-Learning/`
 - 标准启动路径：`cd Projects/RAGAS-Learning && ./init.sh`
 - 标准验证路径：`cd Projects/RAGAS-Learning && python -c "import ragas; print(ragas.__version__)"`
-- 当前最高优先级未完成功能：ragas-006 — evaluate() 综合评估 demo
+- 当前最高优先级未完成功能：ragas-007 — 合成测试数据集生成 demo
 - 当前 blocker：无
 
 ## 会话记录
 
-### Session 004 — 2026-05-04
+### Session 005 — 2026-05-04
+
+- 日期：2026-05-04
+- 本轮目标：完成 ragas-006 evaluate() 综合评估 demo
+- 已完成：ragas-006 验证通过（3 样本 × 4 指标 = 12 个评估任务）
+- 运行过的验证：`uv run python demos/demo_evaluate.py`
+- 已记录证据：feature_list.json ragas-006 evidence 已填充
+- 关键发现：
+  1. `evaluate()` 是同步函数，不需要 `await`（前面各指标用 `single_turn_ascore` 是异步的）
+  2. `LangchainEmbeddingsWrapper` 从 `ragas.embeddings` 导入，不是 `ragas.utils`
+  3. `EvaluationDataset(samples=[...])` 包裹多个 `SingleTurnSample`
+  4. `result.to_pandas()` 返回 DataFrame，包含所有指标列
+  5. 运行时间约 50 秒（3 样本 × 4 指标），有 tqdm 进度条
+- 更新过的文件：demo_evaluate.py, feature_list.json, tutorial.html, claude-progress.md
+- 下一步最佳动作：ragas-007 合成测试数据集生成 demo
 
 - 日期：2026-05-04
 - 本轮目标：完成 ragas-003 Answer Relevancy demo
