@@ -6,7 +6,7 @@
 - 子项目目录：`Projects/RAGAS-Learning/`
 - 标准启动路径：`cd Projects/RAGAS-Learning && ./init.sh`
 - 标准验证路径：`cd Projects/RAGAS-Learning && python -c "import ragas; print(ragas.__version__)"`
-- 当前最高优先级未完成功能：ragas-007 — 合成测试数据集生成 demo
+- 当前最高优先级未完成功能：ragas-008 — 对比评估 Naive RAG vs Reranked RAG
 - 当前 blocker：无
 
 ## 会话记录
@@ -26,6 +26,27 @@
   5. 运行时间约 50 秒（3 样本 × 4 指标），有 tqdm 进度条
 - 更新过的文件：demo_evaluate.py, feature_list.json, tutorial.html, claude-progress.md
 - 下一步最佳动作：ragas-007 合成测试数据集生成 demo
+
+### Session 006 — 2026-05-04
+
+- 日期：2026-05-04
+- 本轮目标：完成 ragas-006 和 ragas-007
+- 已完成：
+  - ragas-006 evaluate() 综合评估 demo 验证通过
+  - ragas-007 合成测试数据集生成 demo 验证通过
+- 运行过的验证：
+  - `uv run python demos/demo_evaluate.py` — 3 样本 × 4 指标 OK
+  - `uv run python demos/demo_testset_generator.py` — 生成 6 条测试样本
+- 已记录证据：feature_list.json ragas-006/007 evidence 已填充
+- 关键发现：
+  1. evaluate() 是同步函数，不需要 await
+  2. LangchainEmbeddingsWrapper 从 ragas.embeddings 导入
+  3. TestsetGenerator 内部执行 7 步 transform 管线
+  4. 需要 rapidfuzz 依赖（NER 重叠度计算）
+  5. 直接用 /opt/homebrew/bin/python3 会缺少 dotenv（需用 uv run 或激活 venv）
+- 修复：延伸阅读改为纯文本标签（原来看起来像链接但不可点击）
+- 更新过的文件：demo_evaluate.py, demo_testset_generator.py, feature_list.json, tutorial.html, claude-progress.md
+- 下一步最佳动作：ragas-008 对比评估 Naive RAG vs Reranked RAG
 
 - 日期：2026-05-04
 - 本轮目标：完成 ragas-003 Answer Relevancy demo

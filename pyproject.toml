@@ -27,4 +27,5 @@ dependencies = [
     "ragas>=0.4.3",
     "streamlit>=1.55.0",
     "transformers>=5.3.0",
+    "rapidfuzz>=3.14.5",
 ]

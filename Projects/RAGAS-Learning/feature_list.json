@@ -137,14 +137,20 @@
       "area": "pipeline",
       "title": "合成测试数据集生成 demo",
       "user_visible_behavior": "运行 demo_testset_generator.py，输入文档，自动生成 question-answer-contexts 测试集。",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
-        "cd Projects/RAGAS-Learning && python demos/demo_testset_generator.py",
+        "cd Projects/RAGAS-Learning && uv run python demos/demo_testset_generator.py",
         "确认输出包含自动生成的 question, answer, contexts 字段。",
         "确认生成至少 3 条测试样本。"
       ],
-      "evidence": [],
-      "notes": "使用 ragas.testset.generator 自动生成评估用的测试数据集，省去手工标注。"
+      "evidence": [
+        "成功生成 6 条测试样本（超过要求的 3 条）",
+        "输出包含 user_input, reference, reference_contexts, persona_name, query_style 等字段",
+        "生成的样本涵盖：相对论、量子力学、光合作用、深度学习等主题",
+        "新增依赖 rapidfuzz（用于 NER 重叠度计算）",
+        "使用 glm-4-plus + embedding-3"
+      ],
+      "notes": "TestsetGenerator 自动执行多步 transform（SummaryExtractor → CustomNodeFilter → EmbeddingExtractor → ThemesExtractor → NERExtractor → 相似度计算），然后生成 personas 和 scenarios，最终输出测试样本。需要 rapidfuzz 依赖。"
     },
     {
       "id": "ragas-008",

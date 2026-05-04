@@ -288,13 +288,15 @@
   .related-link {
     display: block;
     font-size: 13px;
-    color: var(--accent-light);
-    text-decoration: none;
+    color: var(--text-dim);
     padding: 6px 0;
     border-bottom: 1px solid var(--border);
   }
   .related-link:last-child { border-bottom: none; }
-  .related-link:hover { text-decoration: underline; }
+  .related-link::before {
+    content: "📖 ";
+    font-size: 12px;
+  }
 
   @media (max-width: 1100px) {
     .layout { grid-template-columns: 220px 1fr 260px; }
@@ -351,7 +353,7 @@
     </div>
     <div class="nav-item" data-ch="ch7">
       <span>07 合成测试数据集生成</span>
-      <span class="badge badge-pending">TODO</span>
+      <span class="badge badge-passing">PASS</span>
     </div>
     <div class="nav-item" data-ch="ch8">
       <span>08 Naive vs Reranked 对比</span>
@@ -890,12 +892,123 @@ print(df.to_string(index=<span class="keyword">False</span>))</pre>
   <div class="chapter-header">
     <h2>07 合成测试数据集生成</h2>
     <span class="tag tag-pipeline">PIPELINE</span>
-    <span class="badge badge-pending" style="font-size:12px;padding:3px 10px;">TODO</span>
+    <span class="badge badge-passing" style="font-size:12px;padding:3px 10px;">PASSING</span>
     <p class="desc">使用 RAGAS 的 TestsetGenerator 从文档自动生成 question-answer-contexts 测试集，省去手工标注的痛苦。</p>
   </div>
-  <div class="callout callout-info">
-    <span class="callout-icon">&#128640;</span>
-    <div>本章节将在 ragas-007 阶段完成。</div>
+
+  <div class="step open">
+    <div class="step-head">
+      <div class="step-num done">1</div>
+      <span class="step-title">核心原理</span>
+      <span class="step-arrow">&#9654;</span>
+    </div>
+    <div class="step-body">
+      <p>前面的 demo 都需要手工准备 question/answer/contexts 数据。实际项目中，标注测试数据非常耗时。</p>
+      <p>TestsetGenerator 可以<strong>从文档自动生成</strong>评估用的测试集。它会：</p>
+      <p>1. 对文档提取摘要、主题、NER 实体</p>
+      <p>2. 构建文档间的相似度和重叠关系</p>
+      <p>3. 生成虚拟 Personas（用户画像）</p>
+      <p>4. 基于 Personas 和文档内容合成问题</p>
+      <div class="callout callout-info">
+        <span class="callout-icon">&#128161;</span>
+        <div>需要安装 <code class="inline-code">rapidfuzz</code> 依赖（用于 NER 重叠度计算）。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step open">
+    <div class="step-head">
+      <div class="step-num done">2</div>
+      <span class="step-title">完整源码</span>
+      <span class="step-arrow">&#9654;</span>
+    </div>
+    <div class="step-body">
+      <pre><span class="keyword">from</span> langchain_core.documents <span class="keyword">import</span> Document
+<span class="keyword">from</span> ragas.testset <span class="keyword">import</span> TestsetGenerator
+
+<span class="comment"># 准备文档</span>
+docs = [
+    Document(
+        page_content=<span class="string">"相对论是爱因斯坦提出的..."</span>,
+        metadata={<span class="string">"source"</span>: <span class="string">"physics_relativity"</span>},
+    ),
+    Document(
+        page_content=<span class="string">"量子力学是研究微观粒子的..."</span>,
+        metadata={<span class="string">"source"</span>: <span class="string">"physics_quantum"</span>},
+    ),
+    <span class="comment"># ... 更多文档</span>
+]
+
+<span class="comment"># 创建生成器</span>
+generator = TestsetGenerator(llm=llm, embedding_model=embeddings)
+
+<span class="comment"># 生成测试集</span>
+testset = generator.generate_with_langchain_docs(
+    docs,
+    testset_size=<span class="num">5</span>,
+)
+
+<span class="comment"># 查看结果</span>
+df = testset.to_pandas()
+<span class="keyword">for</span> i, row <span class="keyword">in</span> df.iterrows():
+    print(f<span class="string">"问题: {row['user_input']}"</span>)
+    print(f<span class="string">"参考答案: {row['reference'][:80]}..."</span>)</pre>
+    </div>
+  </div>
+
+  <div class="step open">
+    <div class="step-head">
+      <div class="step-num done">3</div>
+      <span class="step-title">运行结果</span>
+      <span class="step-arrow">&#9654;</span>
+    </div>
+    <div class="step-body">
+      <div class="output">Transform 流程:
+  SummaryExtractor:    4/4 完成
+  CustomNodeFilter:    4/4 完成
+  EmbeddingExtractor:  4/4 完成
+  ThemesExtractor:     4/4 完成
+  NERExtractor:        4/4 完成
+  CosineSimilarityBuilder: 1/1 完成
+  OverlapScoreBuilder: 1/1 完成
+
+Generating personas:  3/3 完成
+Generating Scenarios: 2/2 完成
+Generating Samples:   6/6 完成
+
+生成的测试数据集:
+--- 样本 1 ---
+问题: What is 广义相对论?
+参考答案: 广义相对论于1915年提出，将引力解释为时空弯曲的几何效应。
+
+--- 样本 2 ---
+问题: 什么是波粒二象性？
+参考答案: 波粒二象性是量子力学的核心概念之一...
+
+--- 样本 3 ---
+问题: 光反应是什么？
+参考答案: 光反应是光合作用的第一阶段...
+
+--- 样本 4 ---
+问题: 量子力学和深度学习有啥关系？
+参考答案: 量子力学研究微观粒子行为...
+
+--- 样本 5 ---
+问题: 相对论和神经网络各自扮演什么角色？
+参考答案: 相对论是物理学理论...
+
+--- 样本 6 ---
+问题: 量子力学和深度学习有什么关系？
+参考答案: 两者是不同学科领域...
+
+生成样本数: 6
+列名: user_input, reference_contexts, reference,
+      persona_name, query_style, query_length, synthesizer_name</div>
+      <div class="callout callout-success">
+        <span class="callout-icon">&#9989;</span>
+        <div><strong>ragas-007 验证通过！</strong>4 篇文档生成了 6 条测试样本，覆盖简单事实型问题（如"什么是波粒二象性"）和跨文档对比型问题（如"量子力学和深度学习有啥关系"）。自动生成的 persona 和 query_style 让问题更自然。</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -972,8 +1085,10 @@ const sidebarData = {
   },
   ch7: {
     points: [
-      { title: "TestsetGenerator", body: "RAGAS 提供的合成测试集生成器。输入文档，自动生成 question + answer + contexts 三元组。省去大量手工标注工作。", dot: "dot-purple" },
-      { title: "适用场景", body: "1) 快速搭建评估基准线\n2) 在没有标注数据时进行初步评估\n3) 配合人工审核提高效率", dot: "dot-green" }
+      { title: "TestsetGenerator", body: "输入 LangChain Document 列表，自动生成 question + reference + contexts 测试集。支持 generate_with_langchain_docs() 和 generate_with_chunks() 两种入口。", dot: "dot-purple" },
+      { title: "Transform 管线", body: "内部执行多步 transform：\n1. SummaryExtractor — 提取摘要\n2. CustomNodeFilter — 过滤低质量节点\n3. EmbeddingExtractor — 计算向量\n4. ThemesExtractor — 提取主题\n5. NERExtractor — 命名实体识别\n6. CosineSimilarity/OverlapScore — 构建关系", dot: "dot-blue" },
+      { title: "Personas 生成", body: "TestsetGenerator 会根据文档内容自动生成虚拟用户画像（personas），然后基于 persona 和文档内容合成不同风格的问题。", dot: "dot-green" },
+      { title: "rapidfuzz 依赖", body: "NER 重叠度计算需要 rapidfuzz 库。如果缺少会报 ImportError。安装：pip install rapidfuzz 或 uv add rapidfuzz。", dot: "dot-orange" }
     ],
     related: ["RAGAS TestsetGenerator 文档", "LLM-as-Judge 评估方法论"]
   },
