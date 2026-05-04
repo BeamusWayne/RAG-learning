@@ -1,0 +1,142 @@
+{
+  "project": "RAGAS-Learning",
+  "last_updated": "2026-05-04",
+  "rules": {
+    "single_active_feature": true,
+    "passing_requires_evidence": true,
+    "do_not_skip_verification": true
+  },
+  "status_legend": {
+    "not_started": "功能还没开始做。",
+    "in_progress": "这个功能是当前唯一正在进行的任务。",
+    "blocked": "因为已记录的阻塞问题，当前无法继续推进。",
+    "passing": "要求的验证已经通过，并且证据已经记录。"
+  },
+  "features": [
+    {
+      "id": "ragas-001",
+      "priority": 1,
+      "area": "setup",
+      "title": "RAGAS 环境搭建与基础 import 验证",
+      "user_visible_behavior": "pip install ragas 后能成功 import ragas 并打印版本号。",
+      "status": "passing",
+      "verification": [
+        "pip install ragas",
+        "python -c \"import ragas; print(ragas.__version__)\"",
+        "确认无报错并输出版本号。"
+      ],
+      "evidence": [
+        "RAGAS 0.4.3 import 成功",
+        "HuggingFace Datasets 4.8.5 OK",
+        "LangChain 1.2.10 OK",
+        "依赖冲突已解决：mistralai<2 锁定（instructor 1.15.1 与 mistralai 2.x 不兼容）"
+      ],
+      "notes": "mistralai 2.x 与 instructor 1.15.1 不兼容（Mistral 类名已移除），需锁定 mistralai<2。PyTorch 缺失警告不影响核心功能。"
+    },
+    {
+      "id": "ragas-002",
+      "priority": 2,
+      "area": "metrics",
+      "title": "Faithfulness（忠实度）学习 demo",
+      "user_visible_behavior": "运行 demo_faithfulness.py，输入 question + answer + contexts，输出 faithfulness 分数。包含高 Faithfulness 和低 Faithfulness（幻觉）两个对比用例。",
+      "status": "not_started",
+      "verification": [
+        "cd Projects/RAGAS-Learning && python demo_faithfulness.py",
+        "确认输出两个用例的 faithfulness 分数。",
+        "确认高 Faithfulness 用例得分 > 低 Faithfulness 用例。"
+      ],
+      "evidence": [],
+      "notes": "Faithfulness 衡量答案是否忠实于检索上下文，是检测幻觉的核心指标。"
+    },
+    {
+      "id": "ragas-003",
+      "priority": 3,
+      "area": "metrics",
+      "title": "Answer Relevancy（答案相关性）学习 demo",
+      "user_visible_behavior": "运行 demo_answer_relevancy.py，输入 question + answer，输出 answer_relevancy 分数。包含相关答案和不相关答案两个对比用例。",
+      "status": "not_started",
+      "verification": [
+        "cd Projects/RAGAS-Learning && python demo_answer_relevancy.py",
+        "确认输出两个用例的 answer_relevancy 分数。",
+        "确认相关答案得分 > 不相关答案。"
+      ],
+      "evidence": [],
+      "notes": "Answer Relevancy 衡量答案与问题的相关程度。"
+    },
+    {
+      "id": "ragas-004",
+      "priority": 4,
+      "area": "metrics",
+      "title": "Context Precision（上下文精度）学习 demo",
+      "user_visible_behavior": "运行 demo_context_precision.py，输入 question + contexts + ground_truth，输出 context_precision 分数。展示相关上下文排名靠前 vs 靠后的对比。",
+      "status": "not_started",
+      "verification": [
+        "cd Projects/RAGAS-Learning && python demo_context_precision.py",
+        "确认输出两个用例的 context_precision 分数。",
+        "确认相关上下文排名靠前的用例得分更高。"
+      ],
+      "evidence": [],
+      "notes": "Context Precision 衡量检索到的上下文中相关内容是否排名靠前。"
+    },
+    {
+      "id": "ragas-005",
+      "priority": 5,
+      "area": "metrics",
+      "title": "Context Recall（上下文召回）学习 demo",
+      "user_visible_behavior": "运行 demo_context_recall.py，输入 question + contexts + ground_truth，输出 context_recall 分数。展示完整召回 vs 遗漏信息的对比。",
+      "status": "not_started",
+      "verification": [
+        "cd Projects/RAGAS-Learning && python demo_context_recall.py",
+        "确认输出两个用例的 context_recall 分数。",
+        "确认完整召回的用例得分更高。"
+      ],
+      "evidence": [],
+      "notes": "Context Recall 衡量 ground_truth 中的信息是否都被检索到了。"
+    },
+    {
+      "id": "ragas-006",
+      "priority": 6,
+      "area": "pipeline",
+      "title": "端到端 evaluate() 综合评估 demo",
+      "user_visible_behavior": "运行 demo_evaluate.py，传入含多个样本的 Dataset，同时跑全部 4 个指标，输出综合评估结果表格。",
+      "status": "not_started",
+      "verification": [
+        "cd Projects/RAGAS-Learning && python demo_evaluate.py",
+        "确认输出包含 faithfulness, answer_relevancy, context_precision, context_recall 四列。",
+        "确认至少有 3 个样本的评估结果。"
+      ],
+      "evidence": [],
+      "notes": "综合使用 ragas.evaluate() 和 HuggingFace Dataset 进行批量评估。"
+    },
+    {
+      "id": "ragas-007",
+      "priority": 7,
+      "area": "pipeline",
+      "title": "合成测试数据集生成 demo",
+      "user_visible_behavior": "运行 demo_testset_generator.py，输入文档，自动生成 question-answer-contexts 测试集。",
+      "status": "not_started",
+      "verification": [
+        "cd Projects/RAGAS-Learning && python demo_testset_generator.py",
+        "确认输出包含自动生成的 question, answer, contexts 字段。",
+        "确认生成至少 3 条测试样本。"
+      ],
+      "evidence": [],
+      "notes": "使用 ragas.testset.generator 自动生成评估用的测试数据集，省去手工标注。"
+    },
+    {
+      "id": "ragas-008",
+      "priority": 8,
+      "area": "integration",
+      "title": "对比评估：Naive RAG vs Reranked RAG",
+      "user_visible_behavior": "运行 demo_rag_comparison.py，对同一批问题分别用 naive retrieval 和 reranked retrieval 生成答案，用 RAGAS 评估两者差异并输出对比表格。",
+      "status": "not_started",
+      "verification": [
+        "cd Projects/RAGAS-Learning && python demo_rag_comparison.py",
+        "确认输出两种策略的 4 维评估分数对比表。",
+        "确认 reranked 版本在 context_precision 上得分更高。"
+      ],
+      "evidence": [],
+      "notes": "综合应用：用 RAGAS 量化 RAG pipeline 改进效果。依赖仓库 Foundations/RAG-Primer 的知识。"
+    }
+  ]
+}

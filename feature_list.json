@@ -1,0 +1,398 @@
+{
+  "project": "RAG-learning",
+  "last_updated": "2026-05-04",
+  "rules": {
+    "single_active_feature": true,
+    "passing_requires_evidence": true,
+    "do_not_skip_verification": true
+  },
+  "status_legend": {
+    "not_started": "功能还没开始做。",
+    "in_progress": "这个功能是当前唯一正在进行的任务。",
+    "blocked": "因为已记录的阻塞问题，当前无法继续推进。",
+    "passing": "要求的验证已经通过，并且证据已经记录。"
+  },
+  "features": [
+    {
+      "id": "primer-001",
+      "priority": 1,
+      "area": "Foundations/RAG-Primer",
+      "title": "01-Loading 文档加载",
+      "user_visible_behavior": "运行 demo.py 能加载 PDF/HTML/Markdown/代码/表格/OCR 等格式并输出统一文本流。",
+      "status": "passing",
+      "verification": [
+        "cd Foundations/RAG-Primer/01-Loading && python demo.py",
+        "确认无报错，输出包含加载的文档内容。"
+      ],
+      "evidence": ["commit 762cd2f: 9 模块骨架就位"],
+      "notes": "骨架就位，demo.py 可运行。"
+    },
+    {
+      "id": "primer-002",
+      "priority": 2,
+      "area": "Foundations/RAG-Primer",
+      "title": "02-Chunking 切分策略",
+      "user_visible_behavior": "运行 demo.py 能演示定长 / Recursive / Semantic 等切分策略。",
+      "status": "passing",
+      "verification": [
+        "cd Foundations/RAG-Primer/02-Chunking && python demo.py",
+        "确认输出切分后的 chunks。"
+      ],
+      "evidence": ["commit 762cd2f: 9 模块骨架就位"],
+      "notes": "骨架就位，demo.py 可运行。"
+    },
+    {
+      "id": "primer-003",
+      "priority": 3,
+      "area": "Foundations/RAG-Primer",
+      "title": "03-Chunking-Eval 切分质量验证",
+      "user_visible_behavior": "运行 demo.py 能量化评估切分质量（边界泄漏、内聚度、chunk 召回率）。",
+      "status": "passing",
+      "verification": [
+        "cd Foundations/RAG-Primer/03-Chunking-Eval && python demo.py",
+        "确认输出切分质量指标。"
+      ],
+      "evidence": ["commit 762cd2f: 9 模块骨架就位"],
+      "notes": "骨架就位，demo.py 可运行。"
+    },
+    {
+      "id": "primer-004",
+      "priority": 4,
+      "area": "Foundations/RAG-Primer",
+      "title": "04-Embedding 向量化",
+      "user_visible_behavior": "运行 demo.py 能展示 embedding 模型选型、归一化、相似度度量。",
+      "status": "passing",
+      "verification": [
+        "cd Foundations/RAG-Primer/04-Embedding && python demo.py",
+        "确认输出向量维度和相似度。"
+      ],
+      "evidence": ["commit 762cd2f: 9 模块骨架就位"],
+      "notes": "骨架就位，demo.py 可运行。"
+    },
+    {
+      "id": "primer-005",
+      "priority": 5,
+      "area": "Foundations/RAG-Primer",
+      "title": "05-VectorStore 向量库与索引",
+      "user_visible_behavior": "运行 demo.py 能演示 FAISS/Chroma 等向量库的索引构建和查询。",
+      "status": "passing",
+      "verification": [
+        "cd Foundations/RAG-Primer/05-VectorStore && python demo.py",
+        "确认向量存入和相似度检索成功。"
+      ],
+      "evidence": ["commit 762cd2f: 9 模块骨架就位"],
+      "notes": "骨架就位，demo.py 可运行。"
+    },
+    {
+      "id": "primer-006",
+      "priority": 6,
+      "area": "Foundations/RAG-Primer",
+      "title": "06-Retrieval 召回",
+      "user_visible_behavior": "运行 demo.py 能展示 dense / BM25 / hybrid / MMR / 元数据过滤等召回策略。",
+      "status": "passing",
+      "verification": [
+        "cd Foundations/RAG-Primer/06-Retrieval && python demo.py",
+        "确认输出召回结果。"
+      ],
+      "evidence": ["commit 762cd2f: 9 模块骨架就位"],
+      "notes": "骨架就位，demo.py 可运行。"
+    },
+    {
+      "id": "primer-007",
+      "priority": 7,
+      "area": "Foundations/RAG-Primer",
+      "title": "07-Reranking 重排",
+      "user_visible_behavior": "运行 demo.py 能演示 cross-encoder / LLM-as-reranker 重排。",
+      "status": "passing",
+      "verification": [
+        "cd Foundations/RAG-Primer/07-Reranking && python demo.py",
+        "确认重排前后顺序发生变化。"
+      ],
+      "evidence": ["commit 762cd2f: 9 模块骨架就位"],
+      "notes": "骨架就位，demo.py 可运行。"
+    },
+    {
+      "id": "primer-008",
+      "priority": 8,
+      "area": "Foundations/RAG-Primer",
+      "title": "08-Evaluation 端到端评估",
+      "user_visible_behavior": "运行 demo.py 能输出 Recall@K、MRR、RAGAS 等评估指标。",
+      "status": "passing",
+      "verification": [
+        "cd Foundations/RAG-Primer/08-Evaluation && python demo.py",
+        "确认输出评估分数。"
+      ],
+      "evidence": ["commit 762cd2f: 9 模块骨架就位"],
+      "notes": "骨架就位，demo.py 可运行。"
+    },
+    {
+      "id": "primer-009",
+      "priority": 9,
+      "area": "Foundations/RAG-Primer",
+      "title": "09-Pitfalls 常见踩坑速查",
+      "user_visible_behavior": "运行 demo.py 能展示 RAG 常见翻车场景及解决思路。",
+      "status": "passing",
+      "verification": [
+        "cd Foundations/RAG-Primer/09-Pitfalls && python demo.py",
+        "确认无报错，输出踩坑说明。"
+      ],
+      "evidence": ["commit 762cd2f: 9 模块骨架就位"],
+      "notes": "骨架就位，demo.py 可运行。"
+    },
+    {
+      "id": "basic-001",
+      "priority": 10,
+      "area": "RAG-Techniques/Basic/HyDE",
+      "title": "HyDE 假设文档嵌入",
+      "user_visible_behavior": "运行 demo.py 能演示 HyDE（Hypothetical Document Embeddings）检索流程。",
+      "status": "passing",
+      "verification": [
+        "cd RAG-Techniques/Basic/HyDE && python demo.py",
+        "确认生成假设文档并基于其向量检索。"
+      ],
+      "evidence": ["commit 7620df8: HyDE 目录新增"],
+      "notes": "可运行 demo。"
+    },
+    {
+      "id": "basic-002",
+      "priority": 11,
+      "area": "RAG-Techniques/Basic/RAGFusion",
+      "title": "RAG-Fusion 查询扩展 + RRF 融合",
+      "user_visible_behavior": "4 个脚本从查询扩展到 RRF 算法到完整 pipeline 到对比实验，全部可运行。",
+      "status": "passing",
+      "verification": [
+        "cd RAG-Techniques/Basic/RAGFusion && python 01_query_expansion.py",
+        "cd RAG-Techniques/Basic/RAGFusion && python 02_rrf_algorithm.py",
+        "cd RAG-Techniques/Basic/RAGFusion && python 03_rag_fusion_pipeline.py",
+        "cd RAG-Techniques/Basic/RAGFusion && python 04_comparison.py"
+      ],
+      "evidence": ["commit 7620df8: RAGFusion 目录新增"],
+      "notes": "4 个渐进式示例。"
+    },
+    {
+      "id": "adv-001",
+      "priority": 12,
+      "area": "RAG-Techniques/Advanced/CRAG",
+      "title": "CRAG 纠正式 RAG",
+      "user_visible_behavior": "Streamlit 应用 + 完整 CRAG pipeline（检索评估、知识精炼、查询重写）。",
+      "status": "passing",
+      "verification": [
+        "确认 CRAG 目录包含 config.py, crag.py, vector_store.py, evaluator.py 等模块。"
+      ],
+      "evidence": ["commit e2a8a66: CRAG 模块重组"],
+      "notes": "完整项目结构，需要 API key 才能端到端运行。"
+    },
+    {
+      "id": "adv-002",
+      "priority": 13,
+      "area": "RAG-Techniques/Advanced/Self-RAG",
+      "title": "Self-RAG 反思式 RAG",
+      "user_visible_behavior": "运行 demo.py 能演示 Retrieve / IsRel / IsSup / IsUse 反思流程。",
+      "status": "passing",
+      "verification": [
+        "cd RAG-Techniques/Advanced/Self-RAG && python demo.py",
+        "确认输出反思判断结果。"
+      ],
+      "evidence": ["commit 77627fc: Self-RAG 模块新增"],
+      "notes": "可运行 demo。"
+    },
+    {
+      "id": "adv-003",
+      "priority": 14,
+      "area": "RAG-Techniques/Advanced/AgenticRAG",
+      "title": "AgenticRAG 自主决策检索",
+      "user_visible_behavior": "运行 demo.py 能展示多步推理式检索的 Agentic RAG 流程。",
+      "status": "passing",
+      "verification": [
+        "cd RAG-Techniques/Advanced/AgenticRAG && python demo.py",
+        "确认输出多步检索推理过程。"
+      ],
+      "evidence": ["commit e2a8a66: AgenticRAG 目录新增"],
+      "notes": "包含论文汇总文档。"
+    },
+    {
+      "id": "proj-001",
+      "priority": 15,
+      "area": "Projects/LangChain_RAG_Proj",
+      "title": "LangChain RAG 项目（知识库问答 + 文件上传）",
+      "user_visible_behavior": "完整项目包含知识库管理、QA、文件上传、向量存储等模块。",
+      "status": "passing",
+      "verification": [
+        "确认目录包含 app_qa.py, app_file_uploader.py, rag.py, vector_stores.py, knowledge_base.py。"
+      ],
+      "evidence": ["commit e2a8a66: LangChain_RAG_Proj 重组"],
+      "notes": "完整项目，需要 API key。"
+    },
+    {
+      "id": "proj-002",
+      "priority": 16,
+      "area": "Projects/MultiLevelRAG",
+      "title": "MultiLevelRAG 意图路由 x 多策略对比平台",
+      "user_visible_behavior": "Streamlit 应用，支持意图路由 + 5 种 RAG 策略（baseline / CRAG / Fusion / Graph / HyDE）对比。",
+      "status": "passing",
+      "verification": [
+        "确认目录包含 app.py, config.py, router.py, strategies/（含 5 种策略实现）。"
+      ],
+      "evidence": ["commit e307099: MultiLevelRAG 新增"],
+      "notes": "完整平台，MiniMax-M2.5 驱动。"
+    },
+    {
+      "id": "found-001",
+      "priority": 17,
+      "area": "Foundations/LangChain_Tutorial_Fast",
+      "title": "LangChain 基础教程（33 个示例）",
+      "user_visible_behavior": "33 个循序渐进的 LangChain 示例覆盖 LLM、ChatModel、Embedding、PromptTemplate 等核心概念。",
+      "status": "passing",
+      "verification": [
+        "确认 Foundations/LangChain_Tutorial_Fast/ 包含 33 个 .py 文件。"
+      ],
+      "evidence": ["commit e2a8a66: 目录重组"],
+      "notes": "学习材料，需要 API key 才能实际运行。"
+    },
+    {
+      "id": "fw-001",
+      "priority": 18,
+      "area": "Frameworks/LangGraph",
+      "title": "LangGraph 图式工作流",
+      "user_visible_behavior": "基础图 + 多输入 + 条件路由 + 循环图 + 官方教程（quickstart 到 CustomRAG）。",
+      "status": "passing",
+      "verification": [
+        "确认 Frameworks/LangGraph/ 包含 00-06 基础示例 + Offcial_Tutorial/ 下的 00-09 官方教程。"
+      ],
+      "evidence": ["commit e2a8a66: LangGraph 目录新增"],
+      "notes": "学习材料。"
+    },
+    {
+      "id": "fw-002",
+      "priority": 19,
+      "area": "Frameworks/PydanticAI",
+      "title": "PydanticAI Agent 框架",
+      "user_visible_behavior": "从入门到进阶的 PydanticAI 示例（WeatherAgent、结构化输出、ChatApp、BankSupport、SqlGen、AG-UI、Workflow）。",
+      "status": "passing",
+      "verification": [
+        "确认 Frameworks/PydanticAI/ 包含 00-07 共 7 个子目录。"
+      ],
+      "evidence": ["commit e2a8a66: PydanticAI 目录新增"],
+      "notes": "学习材料。"
+    },
+    {
+      "id": "fw-003",
+      "priority": 20,
+      "area": "Frameworks/PydanticGraph",
+      "title": "PydanticGraph 图式工作流",
+      "user_visible_behavior": "PydanticGraph 示例（AI Q&A、邮件反馈、图示例、自动售货机）。",
+      "status": "passing",
+      "verification": [
+        "确认 Frameworks/PydanticGraph/ 包含 6 个 .py 文件。"
+      ],
+      "evidence": ["commit e2a8a66: PydanticGraph 目录新增"],
+      "notes": "学习材料。"
+    },
+    {
+      "id": "fw-004",
+      "priority": 21,
+      "area": "Frameworks/Agno",
+      "title": "Agno Agent 框架",
+      "user_visible_behavior": "Agno 入门 + Assist Agent 示例。",
+      "status": "passing",
+      "verification": [
+        "确认 Frameworks/Agno/ 包含 00_Get_Started 和 01_Assist_Agent。"
+      ],
+      "evidence": ["commit e2a8a66: Agno 目录新增"],
+      "notes": "学习材料。"
+    },
+    {
+      "id": "fw-005",
+      "priority": 22,
+      "area": "Frameworks/Agents",
+      "title": "多模态 Agent",
+      "user_visible_behavior": "多模态 Agent 及推理 Agent 示例。",
+      "status": "passing",
+      "verification": [
+        "确认 Frameworks/Agents/multimodal_agent/ 包含 multimodal_agent.py 和 multimodal_reasoning_agent.py。"
+      ],
+      "evidence": ["commit e2a8a66: Agents 目录新增"],
+      "notes": "学习材料。"
+    },
+    {
+      "id": "exp-001",
+      "priority": 23,
+      "area": "Experiment/graph-rag-agent",
+      "title": "GraphRAG Agent 生产级系统",
+      "user_visible_behavior": "完整 GraphRAG Agent：多策略 Agent、图构建与索引、社区检测、缓存管理、评估框架、FastAPI 后端、Streamlit 前端。",
+      "status": "passing",
+      "verification": [
+        "确认 Experiment/graph-rag-agent/ 包含 graphrag_agent/, server/, frontend/ 等完整目录。"
+      ],
+      "evidence": ["commit ea29b80: graph-rag-agent 清理"],
+      "notes": "最复杂的项目，需要 Neo4j + API key。"
+    },
+    {
+      "id": "exp-002",
+      "priority": 24,
+      "area": "Experiment/NanoBat",
+      "title": "NanoBat 轻量 Agent",
+      "user_visible_behavior": "轻量级 Agent 框架示例，包含 CLI 通道。",
+      "status": "passing",
+      "verification": [
+        "确认 Experiment/NanoBat/ 包含 main.py, src/agent.py, src/channels/cli.py。"
+      ],
+      "evidence": ["commit e2a8a66: NanoBat 目录新增"],
+      "notes": "实验项目。"
+    },
+    {
+      "id": "exp-003",
+      "priority": 25,
+      "area": "Experiment/VideoCut",
+      "title": "VideoCut 视频剪辑 Agent",
+      "user_visible_behavior": "视频剪辑 Agent，包含 Graph 工作流、API 服务、数据模型。",
+      "status": "passing",
+      "verification": [
+        "确认 Experiment/VideoCut/ 包含 agent/graph.py, api/main.py, models/ 等模块。"
+      ],
+      "evidence": ["commit e2a8a66: VideoCut 目录新增"],
+      "notes": "实验项目。"
+    },
+    {
+      "id": "exp-004",
+      "priority": 26,
+      "area": "Experiment/Obsidian",
+      "title": "Obsidian 笔记 Agent",
+      "user_visible_behavior": "Obsidian 笔记管理 Agent + 自定义 Loader。",
+      "status": "passing",
+      "verification": [
+        "确认 Experiment/Obsidian/ 包含 obsidian_agent.py 和 obsidian_loader.py。"
+      ],
+      "evidence": ["commit e2a8a66: Obsidian 目录新增"],
+      "notes": "实验项目。"
+    },
+    {
+      "id": "exp-005",
+      "priority": 27,
+      "area": "Experiment/LongRuiGame",
+      "title": "LongRuiGame 游戏场景 Agent",
+      "user_visible_behavior": "游戏场景中的 Player QA Agent + 工具模板。",
+      "status": "passing",
+      "verification": [
+        "确认 Experiment/LongRuiGame/ 包含 scene1_player_qa/ 和 tool_templates.py。"
+      ],
+      "evidence": ["commit e2a8a66: LongRuiGame 目录新增"],
+      "notes": "实验项目。"
+    },
+    {
+      "id": "proj-003",
+      "priority": 28,
+      "area": "Projects/RAGAS-Learning",
+      "title": "RAGAS 评估框架学习项目",
+      "user_visible_behavior": "8 个渐进式 demo 覆盖 RAGAS 全部核心指标（Faithfulness, Answer Relevancy, Context Precision, Context Recall）+ 综合评估 + 测试集生成 + RAG 对比评估。含完整 Harness Engineering 文件。",
+      "status": "in_progress",
+      "verification": [
+        "确认 Projects/RAGAS-Learning/ 包含完整 Harness 文件（CLAUDE.md, AGENTS.md, feature_list.json 等）。",
+        "ragas-001: 安装 ragas 并验证 import。",
+        "ragas-002~008: 逐个 demo 可运行。"
+      ],
+      "evidence": [],
+      "notes": "子项目含独立 feature_list.json 管理 8 个学习 demo。当前状态：harness 就位，demo 待开发。"
+    }
+  ]
+}

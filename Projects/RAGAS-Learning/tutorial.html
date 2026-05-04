@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAGAS 评估框架 — 由浅入深学习教程</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #222636;
+    --border: #2e3348;
+    --text: #e4e6f0;
+    --text-dim: #8b8fa8;
+    --accent: #7c6ef0;
+    --accent-light: #a99cf7;
+    --green: #4ade80;
+    --orange: #fb923c;
+    --red: #f87171;
+    --blue: #60a5fa;
+    --pink: #f472b6;
+    --chapter-active: rgba(124,110,240,0.12);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, "SF Pro Text", "Helvetica Neue", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #1a1d27 0%, #252a3a 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 32px 40px;
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    background: linear-gradient(90deg, var(--accent-light), var(--pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .header p {
+    color: var(--text-dim);
+    margin-top: 6px;
+    font-size: 14px;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 260px 1fr 300px;
+    min-height: calc(100vh - 100px);
+  }
+
+  .nav {
+    border-right: 1px solid var(--border);
+    padding: 24px 0;
+    overflow-y: auto;
+    position: sticky;
+    top: 0;
+    height: calc(100vh - 100px);
+  }
+  .nav-section {
+    padding: 0 16px;
+    margin-bottom: 20px;
+  }
+  .nav-section-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+    padding-left: 12px;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all .15s;
+    font-size: 14px;
+    color: var(--text-dim);
+    user-select: none;
+  }
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+  .nav-item.active { background: var(--chapter-active); color: var(--accent-light); }
+  .nav-item .badge {
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .badge-passing  { background: rgba(74,222,128,0.15); color: var(--green); }
+  .badge-pending  { background: rgba(139,143,168,0.15); color: var(--text-dim); }
+
+  .content {
+    padding: 32px 40px;
+    overflow-y: auto;
+  }
+  .chapter { display: none; }
+  .chapter.active { display: block; }
+
+  .chapter-header {
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .chapter-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .chapter-header .tag {
+    display: inline-block;
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin-right: 6px;
+  }
+  .tag-setup      { background: rgba(96,165,250,0.15); color: var(--blue); }
+  .tag-metrics    { background: rgba(124,110,240,0.15); color: var(--accent-light); }
+  .tag-pipeline   { background: rgba(244,114,182,0.15); color: var(--pink); }
+  .tag-integration { background: rgba(74,222,128,0.15); color: var(--green); }
+
+  .chapter-header .desc {
+    color: var(--text-dim);
+    margin-top: 8px;
+    font-size: 15px;
+  }
+
+  .step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .step-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .step-head:hover { background: var(--surface2); }
+  .step-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+    background: var(--accent);
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .step-num.done { background: var(--green); }
+  .step-title { font-weight: 600; font-size: 15px; }
+  .step-arrow {
+    margin-left: auto;
+    color: var(--text-dim);
+    font-size: 12px;
+    transition: transform .2s;
+  }
+  .step.open .step-arrow { transform: rotate(90deg); }
+  .step-body {
+    display: none;
+    padding: 0 20px 20px 60px;
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+  .step.open .step-body { display: block; }
+
+  pre {
+    background: #0d0f15;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-family: "SF Mono", "Fira Code", "JetBrains Mono", monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 12px 0;
+    color: #c9d1d9;
+  }
+  code {
+    font-family: "SF Mono", "Fira Code", "JetBrains Mono", monospace;
+    font-size: 13px;
+  }
+  .inline-code {
+    background: var(--surface2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+    color: var(--accent-light);
+  }
+  .comment { color: #6a737d; }
+  .string  { color: #a5d6ff; }
+  .keyword { color: #ff7b72; }
+  .func    { color: #d2a8ff; }
+
+  .callout {
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 12px 0;
+    font-size: 14px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .callout-warn {
+    background: rgba(251,146,60,0.1);
+    border: 1px solid rgba(251,146,60,0.25);
+  }
+  .callout-info {
+    background: rgba(96,165,250,0.1);
+    border: 1px solid rgba(96,165,250,0.25);
+  }
+  .callout-success {
+    background: rgba(74,222,128,0.1);
+    border: 1px solid rgba(74,222,128,0.25);
+  }
+
+  .output {
+    background: #0d0f15;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 12px 0;
+    font-family: "SF Mono", monospace;
+    font-size: 13px;
+    color: var(--green);
+    white-space: pre-wrap;
+  }
+
+  .sidebar {
+    border-left: 1px solid var(--border);
+    padding: 24px 20px;
+    overflow-y: auto;
+    position: sticky;
+    top: 0;
+    height: calc(100vh - 100px);
+  }
+  .sidebar h3 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+  }
+  .point-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+  }
+  .point-card .point-title {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .point-card .point-body {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+  .point-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .dot-purple { background: var(--accent); }
+  .dot-blue   { background: var(--blue); }
+  .dot-green  { background: var(--green); }
+  .dot-orange { background: var(--orange); }
+  .dot-pink   { background: var(--pink); }
+
+  .related-link {
+    display: block;
+    font-size: 13px;
+    color: var(--accent-light);
+    text-decoration: none;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .related-link:last-child { border-bottom: none; }
+  .related-link:hover { text-decoration: underline; }
+
+  @media (max-width: 1100px) {
+    .layout { grid-template-columns: 220px 1fr 260px; }
+  }
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; }
+    .nav, .sidebar { position: static; height: auto; border: none; }
+    .nav { border-bottom: 1px solid var(--border); }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>RAGAS 评估框架 — 由浅入深学习教程</h1>
+  <p>8 个章节，从环境搭建到实战对比，系统掌握 RAG 系统评估方法论</p>
+</div>
+
+<div class="layout">
+
+<!-- LEFT: Chapter Nav -->
+<nav class="nav">
+  <div class="nav-section">
+    <div class="nav-section-title">环境准备</div>
+    <div class="nav-item active" data-ch="ch1">
+      <span>01 环境搭建与 import 验证</span>
+      <span class="badge badge-passing">PASS</span>
+    </div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">核心指标</div>
+    <div class="nav-item" data-ch="ch2">
+      <span>02 Faithfulness 忠实度</span>
+      <span class="badge badge-pending">TODO</span>
+    </div>
+    <div class="nav-item" data-ch="ch3">
+      <span>03 Answer Relevancy</span>
+      <span class="badge badge-pending">TODO</span>
+    </div>
+    <div class="nav-item" data-ch="ch4">
+      <span>04 Context Precision</span>
+      <span class="badge badge-pending">TODO</span>
+    </div>
+    <div class="nav-item" data-ch="ch5">
+      <span>05 Context Recall</span>
+      <span class="badge badge-pending">TODO</span>
+    </div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">综合应用</div>
+    <div class="nav-item" data-ch="ch6">
+      <span>06 evaluate() 综合评估</span>
+      <span class="badge badge-pending">TODO</span>
+    </div>
+    <div class="nav-item" data-ch="ch7">
+      <span>07 合成测试数据集生成</span>
+      <span class="badge badge-pending">TODO</span>
+    </div>
+    <div class="nav-item" data-ch="ch8">
+      <span>08 Naive vs Reranked 对比</span>
+      <span class="badge badge-pending">TODO</span>
+    </div>
+  </div>
+</nav>
+
+<!-- CENTER: Content -->
+<main class="content">
+
+<div class="chapter active" id="ch1">
+  <div class="chapter-header">
+    <h2>01 环境搭建与 import 验证</h2>
+    <span class="tag tag-setup">SETUP</span>
+    <span class="badge badge-passing" style="font-size:12px;padding:3px 10px;">PASSING</span>
+    <p class="desc">安装 RAGAS 及其依赖，确保 <code class="inline-code">import ragas</code> 成功并输出版本号。这是所有后续章节的基础。</p>
+  </div>
+
+  <div class="step open">
+    <div class="step-head">
+      <div class="step-num done">1</div>
+      <span class="step-title">确认 Python 版本与虚拟环境</span>
+      <span class="step-arrow">&#9654;</span>
+    </div>
+    <div class="step-body">
+      <p>本仓库使用 <code class="inline-code">uv</code> 管理虚拟环境。Python 版本需要 &gt;= 3.12。</p>
+      <pre><span class="comment"># 检查 Python 版本</span>
+.venv/bin/python --version
+<span class="comment"># Python 3.12.x</span>
+
+<span class="comment"># 如果没有虚拟环境，先创建</span>
+uv venv
+uv sync</pre>
+      <div class="callout callout-info">
+        <span class="callout-icon">&#128218;</span>
+        <div><strong>为什么用 uv？</strong> uv 是 Rust 编写的 Python 包管理器，比 pip 快 10-100 倍。它用 <code class="inline-code">pyproject.toml</code> 锁定依赖，确保跨会话一致性。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step open">
+    <div class="step-head">
+      <div class="step-num done">2</div>
+      <span class="step-title">安装 ragas 和 datasets</span>
+      <span class="step-arrow">&#9654;</span>
+    </div>
+    <div class="step-body">
+      <p>在仓库根目录运行：</p>
+      <pre><span class="comment"># 添加 ragas 和 datasets 到项目依赖</span>
+uv add ragas datasets</pre>
+      <p>安装完成后 <code class="inline-code">pyproject.toml</code> 会自动更新：</p>
+      <pre><span class="string">"datasets&gt;=4.8.5"</span>,
+<span class="string">"ragas&gt;=0.4.3"</span>,</pre>
+      <div class="callout callout-info">
+        <span class="callout-icon">&#128218;</span>
+        <div><strong>RAGAS 依赖了什么？</strong> ragas 核心依赖：langchain（LLM 调用）、datasets（数据集格式）、instructor（结构化输出）、tiktoken（token 计数）。约 276 个子依赖。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step open">
+    <div class="step-head">
+      <div class="step-num done">3</div>
+      <span class="step-title">解决依赖冲突（关键）</span>
+      <span class="step-arrow">&#9654;</span>
+    </div>
+    <div class="step-body">
+      <p>安装后直接 <code class="inline-code">import ragas</code> 可能报错。实测遇到的冲突：</p>
+      <pre><span class="comment"># 报错信息</span>
+<span class="keyword">ImportError</span>: cannot import name <span class="string">'Mistral'</span> from <span class="string">'mistralai'</span></pre>
+      <p><strong>根因：</strong>instructor 1.15.1 在 <code class="inline-code">providers/mistral/client.py</code> 中调用 <code class="inline-code">from mistralai import Mistral</code>，但 mistralai 2.x 已经移除了这个类名。</p>
+      <p><strong>修复：</strong>在 <code class="inline-code">pyproject.toml</code> 中锁定 mistralai 版本：</p>
+      <pre><span class="string">"mistralai&lt;2"</span>,
+<span class="string">"ragas&gt;=0.4.3"</span>,</pre>
+      <pre><span class="comment"># 然后重新同步</span>
+uv sync</pre>
+      <div class="callout callout-warn">
+        <span class="callout-icon">&#9888;&#65039;</span>
+        <div><strong>重要：</strong>不锁定 mistralai 版本的话，<code class="inline-code">uv sync</code> 每次都会还原到 2.x，导致 import 再次失败。必须写入 pyproject.toml 才能持久化。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step open">
+    <div class="step-head">
+      <div class="step-num done">4</div>
+      <span class="step-title">验证 import 成功</span>
+      <span class="step-arrow">&#9654;</span>
+    </div>
+    <div class="step-body">
+      <pre><span class="keyword">import</span> ragas
+<span class="func">print</span>(ragas.__version__)
+<span class="comment"># 0.4.3</span></pre>
+      <p>也可以直接运行项目初始化脚本：</p>
+      <pre>./init.sh</pre>
+      <div class="output">==&gt; 虚拟环境已激活 (.venv)
+==&gt; 同步依赖 (uv sync)
+==&gt; 验证 RAGAS 导入
+  OK  RAGAS (0.4.3)
+  OK  HuggingFace Datasets (4.8.5)
+  OK  LangChain (1.2.10)
+
+  全部 3 个依赖就绪
+==&gt; 初始化完成</div>
+      <div class="callout callout-success">
+        <span class="callout-icon">&#9989;</span>
+        <div><strong>ragas-001 验证通过！</strong> RAGAS 0.4.3 + Datasets 4.8.5 + LangChain 1.2.10 全部就绪，可以开始学习核心指标了。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step open">
+    <div class="step-head">
+      <div class="step-num done">5</div>
+      <span class="step-title">修复 init.sh 的 Bash/Python 兼容问题</span>
+      <span class="step-arrow">&#9654;</span>
+    </div>
+    <div class="step-body">
+      <p><code class="inline-code">init.sh</code> 内嵌 Python 代码验证依赖。原始写法用双引号包裹 Python 代码，导致 bash 展开 f-string 中的 <code class="inline-code">${...}</code>。</p>
+      <pre><span class="comment"># 错误写法 — bash 会展开 ${ver}</span>
+python -c <span class="string">"
+print(f'OK {label} (${ver})')   # bash 把 ${ver} 当变量展开
+"</span>
+
+<span class="comment"># 正确写法 — 使用单引号 heredoc，bash 不做变量展开</span>
+python &lt;&lt; <span class="string">'PYEOF'</span>
+<span class="func">print</span>(f<span class="string">'OK {label} ({ver})'</span>)   # Python 正确处理 f-string
+PYEOF</pre>
+      <div class="callout callout-info">
+        <span class="callout-icon">&#128218;</span>
+        <div><strong>Shell heredoc 小知识：</strong> <code class="inline-code">&lt;&lt; 'EOF'</code>（带引号）禁止变量展开，<code class="inline-code">&lt;&lt; EOF</code>（无引号）允许展开。嵌入 Python 时始终用带引号的版本。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="chapter" id="ch2">
+  <div class="chapter-header">
+    <h2>02 Faithfulness（忠实度）</h2>
+    <span class="tag tag-metrics">METRICS</span>
+    <span class="badge badge-pending" style="font-size:12px;padding:3px 10px;">TODO</span>
+    <p class="desc">Faithfulness 衡量模型生成的答案是否忠实于检索到的上下文，是检测幻觉（Hallucination）的核心指标。</p>
+  </div>
+  <div class="callout callout-info">
+    <span class="callout-icon">&#128640;</span>
+    <div>本章节将在 ragas-002 阶段完成。届时会包含完整的 demo 代码、高低忠实度对比用例和运行结果。</div>
+  </div>
+</div>
+
+<div class="chapter" id="ch3">
+  <div class="chapter-header">
+    <h2>03 Answer Relevancy（答案相关性）</h2>
+    <span class="tag tag-metrics">METRICS</span>
+    <span class="badge badge-pending" style="font-size:12px;padding:3px 10px;">TODO</span>
+    <p class="desc">Answer Relevancy 衡量生成的答案与用户提问的相关程度。答非所问会得到低分。</p>
+  </div>
+  <div class="callout callout-info">
+    <span class="callout-icon">&#128640;</span>
+    <div>本章节将在 ragas-003 阶段完成。</div>
+  </div>
+</div>
+
+<div class="chapter" id="ch4">
+  <div class="chapter-header">
+    <h2>04 Context Precision（上下文精度）</h2>
+    <span class="tag tag-metrics">METRICS</span>
+    <span class="badge badge-pending" style="font-size:12px;padding:3px 10px;">TODO</span>
+    <p class="desc">Context Precision 衡量检索到的上下文中，相关内容是否排名靠前。好的检索系统应该把最相关的片段排在前面。</p>
+  </div>
+  <div class="callout callout-info">
+    <span class="callout-icon">&#128640;</span>
+    <div>本章节将在 ragas-004 阶段完成。</div>
+  </div>
+</div>
+
+<div class="chapter" id="ch5">
+  <div class="chapter-header">
+    <h2>05 Context Recall（上下文召回）</h2>
+    <span class="tag tag-metrics">METRICS</span>
+    <span class="badge badge-pending" style="font-size:12px;padding:3px 10px;">TODO</span>
+    <p class="desc">Context Recall 衡量标准答案（ground truth）中的信息是否都被检索到的上下文覆盖。遗漏关键信息会扣分。</p>
+  </div>
+  <div class="callout callout-info">
+    <span class="callout-icon">&#128640;</span>
+    <div>本章节将在 ragas-005 阶段完成。</div>
+  </div>
+</div>
+
+<div class="chapter" id="ch6">
+  <div class="chapter-header">
+    <h2>06 evaluate() 综合评估</h2>
+    <span class="tag tag-pipeline">PIPELINE</span>
+    <span class="badge badge-pending" style="font-size:12px;padding:3px 10px;">TODO</span>
+    <p class="desc">使用 <code class="inline-code">ragas.evaluate()</code> 对多个样本同时跑全部 4 个指标，输出综合评估结果表格。</p>
+  </div>
+  <div class="callout callout-info">
+    <span class="callout-icon">&#128640;</span>
+    <div>本章节将在 ragas-006 阶段完成。</div>
+  </div>
+</div>
+
+<div class="chapter" id="ch7">
+  <div class="chapter-header">
+    <h2>07 合成测试数据集生成</h2>
+    <span class="tag tag-pipeline">PIPELINE</span>
+    <span class="badge badge-pending" style="font-size:12px;padding:3px 10px;">TODO</span>
+    <p class="desc">使用 RAGAS 的 TestsetGenerator 从文档自动生成 question-answer-contexts 测试集，省去手工标注的痛苦。</p>
+  </div>
+  <div class="callout callout-info">
+    <span class="callout-icon">&#128640;</span>
+    <div>本章节将在 ragas-007 阶段完成。</div>
+  </div>
+</div>
+
+<div class="chapter" id="ch8">
+  <div class="chapter-header">
+    <h2>08 Naive RAG vs Reranked RAG 对比</h2>
+    <span class="tag tag-integration">INTEGRATION</span>
+    <span class="badge badge-pending" style="font-size:12px;padding:3px 10px;">TODO</span>
+    <p class="desc">综合实战：对同一批问题分别用 naive retrieval 和 reranked retrieval 生成答案，用 RAGAS 量化改进效果。</p>
+  </div>
+  <div class="callout callout-info">
+    <span class="callout-icon">&#128640;</span>
+    <div>本章节将在 ragas-008 阶段完成。依赖仓库 RAG-Primer 的知识。</div>
+  </div>
+</div>
+
+</main>
+
+<!-- RIGHT: Key Points -->
+<aside class="sidebar" id="sidebar"></aside>
+
+</div>
+
+<script>
+const sidebarData = {
+  ch1: {
+    points: [
+      { title: "RAGAS 是什么", body: "RAG Assessment（RAGAS）是一个开源框架，专门用于评估 RAG（检索增强生成）系统的质量。它提供了一系列自动化指标，无需人工标注即可评估系统性能。", dot: "dot-purple" },
+      { title: "核心依赖关系", body: "ragas 0.4.3 → instructor 1.15.1 → mistralai &lt; 2。这条链路是环境能否跑通的关键。instructor 1.15.1 调用 mistralai.Mistral，在 2.x 中已移除。", dot: "dot-orange" },
+      { title: "uv vs pip", body: "uv 是 Astral（ruff 团队）出的 Python 包管理器。它用 pyproject.toml + uv.lock 锁定依赖，比 requirements.txt 更可靠。uv sync 确保每次环境一致。", dot: "dot-blue" },
+      { title: "PyTorch 警告可忽略", body: "import ragas 时出现的 'PyTorch was not found' 警告来自 transformers 库。RAGAS 的评估功能通过 API 调用 LLM，不需要本地 PyTorch。", dot: "dot-green" },
+      { title: "Bash heredoc 规则", body: "在 shell 脚本中嵌入 Python 代码时，用 &lt;&lt;'EOF'（带引号）防止 bash 展开变量。Python f-string 中的 ${} 会被 bash 误解析。", dot: "dot-pink" }
+    ],
+    related: ["RAGAS 官方文档：Get Started", "uv 官方文档：pyproject.toml 指南", "instructor 库：结构化 LLM 输出"]
+  },
+  ch2: {
+    points: [
+      { title: "Faithfulness 含义", body: "衡量 answer 中的每个声明是否都能在 retrieved contexts 中找到依据。高忠实度 = 低幻觉。", dot: "dot-purple" },
+      { title: "评估流程", body: "1) 从 answer 中提取声明（claims）\n2) 判断每条声明是否被 contexts 支持\n3) 计算支持的声明占比", dot: "dot-blue" },
+      { title: "典型分数", body: "完全基于上下文的答案 → 接近 1.0\n编造事实的答案 → 接近 0.0", dot: "dot-green" }
+    ],
+    related: ["RAGAS Faithfulness 文档", "RAG 检索增强生成：幻觉问题综述"]
+  },
+  ch3: {
+    points: [
+      { title: "Answer Relevancy 含义", body: "衡量 answer 与 question 的语义相关度。答非所问得低分。注意：高相关性 ≠ 高忠实度。", dot: "dot-purple" },
+      { title: "评估方法", body: "从 answer 反向生成可能的问题，计算与原始问题的语义相似度。相似度越高 → 答案越切题。", dot: "dot-blue" }
+    ],
+    related: ["RAGAS Answer Relevancy 文档", "BLEU / ROUGE 等传统指标对比"]
+  },
+  ch4: {
+    points: [
+      { title: "Context Precision 含义", body: "衡量检索到的上下文列表中，相关片段是否排在靠前位置。好的检索系统把最相关内容排在前面。", dot: "dot-purple" },
+      { title: "实际意义", body: "LLM 上下文窗口有限，排在前面的内容权重更大。如果相关信息排在末尾，模型可能忽略。", dot: "dot-blue" }
+    ],
+    related: ["RAGAS Context Precision 文档", "信息检索：MRR / NDCG 指标"]
+  },
+  ch5: {
+    points: [
+      { title: "Context Recall 含义", body: "衡量 ground truth 中的关键信息是否都被检索到的上下文覆盖。遗漏 → 低召回。", dot: "dot-purple" },
+      { title: "Precision vs Recall", body: "Precision：检索到的东西有多准？\nRecall：该检索到的是不是都检索到了？\n两者互补，一起看才能全面评估。", dot: "dot-orange" }
+    ],
+    related: ["RAGAS Context Recall 文档", "RAG 检索策略：chunk size 与 recall 的关系"]
+  },
+  ch6: {
+    points: [
+      { title: "evaluate() 函数", body: "RAGAS 的核心入口函数。接收 Dataset + metrics 列表，批量评估所有样本，返回综合结果。", dot: "dot-purple" },
+      { title: "Dataset 格式", body: "需要的列：user_input（问题）、response（答案）、retrieved_contexts（检索上下文）、reference（标准答案）。具体列取决于用了哪些指标。", dot: "dot-blue" }
+    ],
+    related: ["RAGAS evaluate() API 文档", "HuggingFace Datasets 使用指南"]
+  },
+  ch7: {
+    points: [
+      { title: "TestsetGenerator", body: "RAGAS 提供的合成测试集生成器。输入文档，自动生成 question + answer + contexts 三元组。省去大量手工标注工作。", dot: "dot-purple" },
+      { title: "适用场景", body: "1) 快速搭建评估基准线\n2) 在没有标注数据时进行初步评估\n3) 配合人工审核提高效率", dot: "dot-green" }
+    ],
+    related: ["RAGAS TestsetGenerator 文档", "LLM-as-Judge 评估方法论"]
+  },
+  ch8: {
+    points: [
+      { title: "Reranking 原理", body: "先用 BM25/向量检索召回候选文档，再用交叉编码器（cross-encoder）对 query-document 对重排序，提升相关性。", dot: "dot-purple" },
+      { title: "预期结论", body: "Reranked RAG 在 Context Precision 上应显著高于 Naive RAG。Faithfulness 和 Context Recall 也可能提升。", dot: "dot-green" }
+    ],
+    related: ["RAGAS 对比评估教程", "Cohere Rerank / BGE Reranker"]
+  }
+};
+
+function renderSidebar(chId) {
+  const data = sidebarData[chId];
+  const el = document.getElementById('sidebar');
+  if (!data) { el.innerHTML = ''; return; }
+  let html = '<h3>要点与关联知识</h3>';
+  data.points.forEach(p => {
+    html += '<div class="point-card"><div class="point-title"><span class="point-dot ' + p.dot + '"></span>' + p.title + '</div><div class="point-body">' + p.body.replace(/\n/g, '<br>') + '</div></div>';
+  });
+  if (data.related && data.related.length) {
+    html += '<h3 style="margin-top:20px;">延伸阅读</h3>';
+    data.related.forEach(r => { html += '<span class="related-link">' + r + '</span>'; });
+  }
+  el.innerHTML = html;
+}
+
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const ch = item.dataset.ch;
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    item.classList.add('active');
+    document.querySelectorAll('.chapter').forEach(c => c.classList.remove('active'));
+    document.getElementById(ch).classList.add('active');
+    renderSidebar(ch);
+  });
+});
+
+document.querySelectorAll('.step-head').forEach(head => {
+  head.addEventListener('click', () => { head.closest('.step').classList.toggle('open'); });
+});
+
+renderSidebar('ch1');
+</script>
+
+</body>
+</html>
