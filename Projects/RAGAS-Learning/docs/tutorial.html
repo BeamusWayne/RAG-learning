@@ -35,6 +35,12 @@
     border-bottom: 1px solid var(--border);
     padding: 32px 40px;
   }
+  .header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
   .header h1 {
     font-size: 28px;
     font-weight: 700;
@@ -46,6 +52,25 @@
     color: var(--text-dim);
     margin-top: 6px;
     font-size: 14px;
+  }
+  .progress-bar {
+    background: var(--surface2);
+    border-radius: 8px;
+    height: 8px;
+    width: 180px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--green), #34d399);
+    border-radius: 8px;
+  }
+  .progress-label {
+    font-size: 13px;
+    color: var(--green);
+    font-weight: 600;
+    text-align: right;
+    margin-bottom: 4px;
   }
 
   .layout {
@@ -96,7 +121,6 @@
     flex-shrink: 0;
   }
   .badge-passing  { background: rgba(74,222,128,0.15); color: var(--green); }
-  .badge-pending  { background: rgba(139,143,168,0.15); color: var(--text-dim); }
 
   .content {
     padding: 32px 40px;
@@ -126,6 +150,7 @@
   .tag-metrics    { background: rgba(124,110,240,0.15); color: var(--accent-light); }
   .tag-pipeline   { background: rgba(244,114,182,0.15); color: var(--pink); }
   .tag-integration { background: rgba(74,222,128,0.15); color: var(--green); }
+  .tag-overview   { background: rgba(251,146,60,0.15); color: var(--orange); }
 
   .chapter-header .desc {
     color: var(--text-dim);
@@ -186,6 +211,7 @@
     line-height: 1.6;
     margin: 12px 0;
     color: #c9d1d9;
+    position: relative;
   }
   code {
     font-family: "SF Mono", "Fira Code", "JetBrains Mono", monospace;
@@ -202,6 +228,24 @@
   .string  { color: #a5d6ff; }
   .keyword { color: #ff7b72; }
   .func    { color: #d2a8ff; }
+  .num     { color: #79c0ff; }
+
+  .copy-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity .2s;
+  }
+  pre:hover .copy-btn { opacity: 1; }
+  .copy-btn:hover { background: var(--accent); color: #fff; }
 
   .callout {
     border-radius: 10px;
@@ -293,10 +337,67 @@
     border-bottom: 1px solid var(--border);
   }
   .related-link:last-child { border-bottom: none; }
-  .related-link::before {
-    content: "📖 ";
-    font-size: 12px;
+  .related-link::before { content: "\1F4D6 "; font-size: 12px; }
+
+  .overview {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
   }
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .overview-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    font-size: 13px;
+    transition: border-color .2s;
+  }
+  .overview-item:hover { border-color: var(--accent); }
+  .oi-num { font-size: 20px; font-weight: 700; color: var(--accent-light); }
+  .oi-label { color: var(--text-dim); margin-top: 4px; }
+  .oi-score { color: var(--green); font-weight: 600; font-size: 12px; margin-top: 2px; }
+
+  .metrics-summary {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .metric-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .mc-title { font-size: 13px; color: var(--text-dim); }
+  .mc-formula { font-size: 12px; color: var(--accent-light); margin-top: 4px; font-family: monospace; }
+  .mc-desc { font-size: 12px; color: var(--text-dim); margin-top: 6px; line-height: 1.5; }
+
+  .celebration {
+    background: linear-gradient(135deg, rgba(124,110,240,0.1), rgba(74,222,128,0.1));
+    border: 1px solid rgba(74,222,128,0.3);
+    border-radius: 12px;
+    padding: 32px;
+    text-align: center;
+    margin: 24px 0;
+  }
+  .celebration h3 {
+    font-size: 22px;
+    background: linear-gradient(90deg, var(--accent-light), var(--green));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  .celebration p { color: var(--text-dim); font-size: 15px; }
 
   @media (max-width: 1100px) {
     .layout { grid-template-columns: 220px 1fr 260px; }
@@ -305,14 +406,24 @@
     .layout { grid-template-columns: 1fr; }
     .nav, .sidebar { position: static; height: auto; border: none; }
     .nav { border-bottom: 1px solid var(--border); }
+    .overview-grid { grid-template-columns: repeat(2, 1fr); }
+    .metrics-summary { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>RAGAS 评估框架 — 由浅入深学习教程</h1>
-  <p>8 个章节，从环境搭建到实战对比，系统掌握 RAG 系统评估方法论</p>
+  <div class="header-row">
+    <div>
+      <h1>RAGAS 评估框架 — 由浅入深学习教程</h1>
+      <p>8 个章节，从环境搭建到实战对比，系统掌握 RAG 系统评估方法论</p>
+    </div>
+    <div>
+      <div class="progress-label">8/8 完成</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+    </div>
+  </div>
 </div>
 
 <div class="layout">
@@ -320,8 +431,15 @@
 <!-- LEFT: Chapter Nav -->
 <nav class="nav">
   <div class="nav-section">
+    <div class="nav-section-title">总览</div>
+    <div class="nav-item active" data-ch="ch0">
+      <span>课程概览与指标速查</span>
+      <span class="badge badge-passing">PASS</span>
+    </div>
+  </div>
+  <div class="nav-section">
     <div class="nav-section-title">环境准备</div>
-    <div class="nav-item active" data-ch="ch1">
+    <div class="nav-item" data-ch="ch1">
       <span>01 环境搭建与 import 验证</span>
       <span class="badge badge-passing">PASS</span>
     </div>
@@ -365,7 +483,64 @@
 <!-- CENTER: Content -->
 <main class="content">
 
-<div class="chapter active" id="ch1">
+<!-- ========== CH0: Overview ========== -->
+<div class="chapter active" id="ch0">
+  <div class="chapter-header">
+    <h2>课程概览与指标速查</h2>
+    <span class="tag tag-overview">OVERVIEW</span>
+    <p class="desc">RAGAS 评估框架的核心概念、四大指标速查表和学习路径。</p>
+  </div>
+
+  <div class="overview">
+    <h3 style="font-size:16px;margin-bottom:4px;">什么是 RAGAS？</h3>
+    <p style="color:var(--text-dim);font-size:14px;">RAGAS（RAG Assessment）是开源的 RAG 系统评估框架。它提供 4 个核心自动化指标，无需人工标注即可量化评估检索增强生成系统的质量。本教程使用 RAGAS 0.4.3 + 智谱 GLM-4 API。</p>
+  </div>
+
+  <div class="metrics-summary">
+    <div class="metric-card">
+      <div class="mc-title">Faithfulness（忠实度）</div>
+      <div class="mc-formula">answer claims supported by contexts</div>
+      <div class="mc-desc">检测幻觉。答案中的声明是否都能在检索上下文中找到依据？需要 LLM。</div>
+    </div>
+    <div class="metric-card">
+      <div class="mc-title">Answer Relevancy（答案相关性）</div>
+      <div class="mc-formula">sim(question, reverse_questions(answer))</div>
+      <div class="mc-desc">答案是否切题？从答案反向生成问题，计算与原问题的语义相似度。需要 LLM + Embeddings。</div>
+    </div>
+    <div class="metric-card">
+      <div class="mc-title">Context Precision（上下文精度）</div>
+      <div class="mc-formula">weighted relevance by rank position</div>
+      <div class="mc-desc">检索质量。相关上下文是否排在前面？好的检索系统把最相关的排第一。需要 LLM。</div>
+    </div>
+    <div class="metric-card">
+      <div class="mc-title">Context Recall（上下文召回）</div>
+      <div class="mc-formula">reference claims covered by contexts</div>
+      <div class="mc-desc">覆盖完整性。标准答案中的信息是否都被检索到了？遗漏关键信息会扣分。需要 LLM。</div>
+    </div>
+  </div>
+
+  <div class="overview" style="margin-top:20px;">
+    <h3 style="font-size:16px;margin-bottom:4px;">学习路径</h3>
+    <div class="overview-grid">
+      <div class="overview-item"><div class="oi-num">01</div><div class="oi-label">环境搭建</div><div class="oi-score">SETUP</div></div>
+      <div class="overview-item"><div class="oi-num">02</div><div class="oi-label">Faithfulness</div><div class="oi-score">1.0 / 0.0</div></div>
+      <div class="overview-item"><div class="oi-num">03</div><div class="oi-label">Answer Relevancy</div><div class="oi-score">0.87 / 0.46</div></div>
+      <div class="overview-item"><div class="oi-num">04</div><div class="oi-label">Context Precision</div><div class="oi-score">1.0 / 0.33</div></div>
+      <div class="overview-item"><div class="oi-num">05</div><div class="oi-label">Context Recall</div><div class="oi-score">1.0 / 0.5</div></div>
+      <div class="overview-item"><div class="oi-num">06</div><div class="oi-label">evaluate()</div><div class="oi-score">3 samples</div></div>
+      <div class="overview-item"><div class="oi-num">07</div><div class="oi-label">TestsetGenerator</div><div class="oi-score">6 samples</div></div>
+      <div class="overview-item"><div class="oi-num">08</div><div class="oi-label">RAG 对比</div><div class="oi-score">+0.17 recall</div></div>
+    </div>
+  </div>
+
+  <div class="celebration">
+    <h3>全部 8 个功能验证通过</h3>
+    <p>从环境搭建到完整的 RAG Pipeline 对比评估，每一步都有可运行的 demo 和真实输出结果。</p>
+  </div>
+</div>
+
+<!-- ========== CH1: Setup ========== -->
+<div class="chapter" id="ch1">
   <div class="chapter-header">
     <h2>01 环境搭建与 import 验证</h2>
     <span class="tag tag-setup">SETUP</span>
@@ -491,6 +666,7 @@ PYEOF</pre>
   </div>
 </div>
 
+<!-- ========== CH2: Faithfulness ========== -->
 <div class="chapter" id="ch2">
   <div class="chapter-header">
     <h2>02 Faithfulness（忠实度）</h2>
@@ -502,24 +678,14 @@ PYEOF</pre>
   <div class="step open">
     <div class="step-head">
       <div class="step-num done">1</div>
-      <span class="step-title">RAGAS 0.4.3 API 调用方式</span>
+      <span class="step-title">核心原理</span>
       <span class="step-arrow">&#9654;</span>
     </div>
     <div class="step-body">
-      <p>RAGAS 0.4.x 使用 <code class="inline-code">SingleTurnSample</code> 封装输入，通过 <code class="inline-code">single_turn_ascore()</code> 异步评估：</p>
-      <pre><span class="keyword">from</span> ragas.dataset_schema <span class="keyword">import</span> SingleTurnSample
-<span class="keyword">from</span> ragas.metrics._faithfulness <span class="keyword">import</span> Faithfulness
-
-sample = SingleTurnSample(
-    user_input=<span class="string">"问题"</span>,
-    response=<span class="string">"答案"</span>,
-    retrieved_contexts=[<span class="string">"上下文1"</span>],
-)
-scorer = Faithfulness(llm=llm)
-score = <span class="keyword">await</span> scorer.single_turn_ascore(sample)</pre>
-      <div class="callout callout-warn">
-        <span class="callout-icon">&#9888;&#65039;</span>
-        <div><strong>必须显式传入 LLM：</strong>RAGAS 0.4.3 不会自动从环境变量创建 LLM。需要 <code class="inline-code">llm_factory(model, client=OpenAI(...))</code> 手动创建。</div>
+      <p>Faithfulness 衡量答案中的每个声明是否都能在检索上下文中找到依据。LLM 先从答案中提取声明（claims），然后逐条判断是否被上下文支持。</p>
+      <div class="callout callout-info">
+        <span class="callout-icon">&#128218;</span>
+        <div>高忠实度 = 低幻觉。这是 RAG 系统最重要的安全指标——防止模型编造事实。</div>
       </div>
     </div>
   </div>
@@ -540,16 +706,55 @@ score = <span class="keyword">await</span> scorer.single_turn_ascore(sample)</pr
 <span class="keyword">from</span> ragas.llms <span class="keyword">import</span> llm_factory
 
 client = OpenAI(
-    api_key=<span class="string">"your-key"</span>,
+    api_key=os.environ[<span class="string">"ZHIPU_API_KEY"</span>],
     base_url=<span class="string">"https://open.bigmodel.cn/api/paas/v4"</span>,
 )
 llm = llm_factory(<span class="string">"glm-4-flash"</span>, client=client)</pre>
+      <div class="callout callout-warn">
+        <span class="callout-icon">&#9888;&#65039;</span>
+        <div><strong>必须显式传入 LLM：</strong>RAGAS 0.4.3 不会自动从环境变量创建 LLM。需要 <code class="inline-code">llm_factory(model, client=OpenAI(...))</code> 手动创建。</div>
+      </div>
     </div>
   </div>
 
   <div class="step open">
     <div class="step-head">
       <div class="step-num done">3</div>
+      <span class="step-title">完整源码</span>
+      <span class="step-arrow">&#9654;</span>
+    </div>
+    <div class="step-body">
+      <pre><span class="keyword">from</span> ragas.dataset_schema <span class="keyword">import</span> SingleTurnSample
+<span class="keyword">from</span> ragas.metrics._faithfulness <span class="keyword">import</span> Faithfulness
+
+<span class="comment"># 高忠实度 — 答案完全基于上下文</span>
+sample_high = SingleTurnSample(
+    user_input=<span class="string">"爱因斯坦有什么贡献？"</span>,
+    response=<span class="string">"爱因斯坦提出了相对论。"</span>,
+    retrieved_contexts=[
+        <span class="string">"爱因斯坦于1905年提出狭义相对论..."</span>,
+    ],
+)
+scorer = Faithfulness(llm=llm)
+score_high = <span class="keyword">await</span> scorer.single_turn_ascore(sample_high)
+<span class="comment"># score_high = 1.0</span>
+
+<span class="comment"># 低忠实度 — 答案包含幻觉</span>
+sample_low = SingleTurnSample(
+    user_input=<span class="string">"爱因斯坦有什么贡献？"</span>,
+    response=<span class="string">"爱因斯坦发明了电话。"</span>,  <span class="comment"># ✗ 编造事实</span>
+    retrieved_contexts=[
+        <span class="string">"爱因斯坦于1905年提出狭义相对论..."</span>,
+    ],
+)
+score_low = <span class="keyword">await</span> scorer.single_turn_ascore(sample_low)
+<span class="comment"># score_low = 0.0</span></pre>
+    </div>
+  </div>
+
+  <div class="step open">
+    <div class="step-head">
+      <div class="step-num done">4</div>
       <span class="step-title">运行结果</span>
       <span class="step-arrow">&#9654;</span>
     </div>
@@ -566,6 +771,7 @@ llm = llm_factory(<span class="string">"glm-4-flash"</span>, client=client)</pre
   </div>
 </div>
 
+<!-- ========== CH3: Answer Relevancy ========== -->
 <div class="chapter" id="ch3">
   <div class="chapter-header">
     <h2>03 Answer Relevancy（答案相关性）</h2>
@@ -584,7 +790,7 @@ llm = llm_factory(<span class="string">"glm-4-flash"</span>, client=client)</pre
       <p>Answer Relevancy 的评估方式很巧妙：它不直接比较问题和答案，而是<strong>从答案反向生成可能的问题</strong>，然后计算生成问题与原始问题的语义相似度。</p>
       <div class="callout callout-info">
         <span class="callout-icon">&#128218;</span>
-        <div>因此它需要两个组件：<strong>LLM</strong>（生成反向问题）+ <strong>Embeddings</strong>（计算语义相似度）。</div>
+        <div>因此它需要两个组件：<strong>LLM</strong>（生成反向问题）+ <strong>Embeddings</strong>（计算语义相似度）。glm-4-flash 的反向问题质量不足，需用 glm-4-plus。</div>
       </div>
     </div>
   </div>
@@ -596,34 +802,21 @@ llm = llm_factory(<span class="string">"glm-4-flash"</span>, client=client)</pre
       <span class="step-arrow">&#9654;</span>
     </div>
     <div class="step-body">
-      <pre><span class="keyword">import</span> asyncio
-<span class="keyword">from</span> dotenv <span class="keyword">import</span> load_dotenv
-<span class="keyword">from</span> openai <span class="keyword">import</span> OpenAI
-<span class="keyword">from</span> langchain_openai <span class="keyword">import</span> OpenAIEmbeddings
+      <pre><span class="keyword">from</span> langchain_community.embeddings <span class="keyword">import</span> OpenAIEmbeddings
 <span class="keyword">from</span> ragas.dataset_schema <span class="keyword">import</span> SingleTurnSample
 <span class="keyword">from</span> ragas.embeddings <span class="keyword">import</span> LangchainEmbeddingsWrapper
-<span class="keyword">from</span> ragas.llms <span class="keyword">import</span> llm_factory
 <span class="keyword">from</span> ragas.metrics._answer_relevance <span class="keyword">import</span> ResponseRelevancy
-
-load_dotenv(<span class="string">"../../.env"</span>)
-
-<span class="comment"># LLM — 用 glm-4-plus（flash 的反向问题质量不足）</span>
-client = OpenAI(
-    api_key=os.environ[<span class="string">"ZHIPU_API_KEY"</span>],
-    base_url=<span class="string">"https://open.bigmodel.cn/api/paas/v4"</span>,
-)
-llm = llm_factory(<span class="string">"glm-4-plus"</span>, client=client)
 
 <span class="comment"># Embeddings — 智谱 embedding-3</span>
 emb = OpenAIEmbeddings(
     model=<span class="string">"embedding-3"</span>,
-    api_key=os.environ[<span class="string">"ZHIPU_API_KEY"</span>],
-    base_url=<span class="string">"https://open.bigmodel.cn/api/paas/v4"</span>,
+    openai_api_key=os.environ[<span class="string">"ZHIPU_API_KEY"</span>],
+    openai_api_base=<span class="string">"https://open.bigmodel.cn/api/paas/v4"</span>,
 )
 embeddings = LangchainEmbeddingsWrapper(embeddings=emb)
 
-<span class="comment"># 评估</span>
-scorer = ResponseRelevancy(llm=llm, embeddings=embeddings, strictness=1)
+<span class="comment"># 评估（LLM 用 glm-4-plus）</span>
+scorer = ResponseRelevancy(llm=llm, embeddings=embeddings, strictness=<span class="num">1</span>)
 sample = SingleTurnSample(
     user_input=<span class="string">"Python 的列表推导式是什么？"</span>,
     response=<span class="string">"列表推导式是从已有列表创建新列表的简洁语法..."</span>,
@@ -651,6 +844,7 @@ score = <span class="keyword">await</span> scorer.single_turn_ascore(sample)</pr
   </div>
 </div>
 
+<!-- ========== CH4: Context Precision ========== -->
 <div class="chapter" id="ch4">
   <div class="chapter-header">
     <h2>04 Context Precision（上下文精度）</h2>
@@ -716,9 +910,11 @@ score = <span class="keyword">await</span> scorer.single_turn_ascore(sample_high
         <span class="callout-icon">&#9989;</span>
         <div><strong>ragas-004 验证通过！</strong>相关排第一得分 1.0，排最后得分 0.33（1/3）。完美体现排名对分数的影响。</div>
       </div>
+    </div>
   </div>
 </div>
 
+<!-- ========== CH5: Context Recall ========== -->
 <div class="chapter" id="ch5">
   <div class="chapter-header">
     <h2>05 Context Recall（上下文召回）</h2>
@@ -786,6 +982,7 @@ score = <span class="keyword">await</span> scorer.single_turn_ascore(sample)
   </div>
 </div>
 
+<!-- ========== CH6: evaluate() ========== -->
 <div class="chapter" id="ch6">
   <div class="chapter-header">
     <h2>06 evaluate() 综合评估</h2>
@@ -870,10 +1067,10 @@ print(df.to_string(index=<span class="keyword">False</span>))</pre>
 
 综合评估结果（3 个样本 × 4 个指标）:
 ────────────────────────────────────────
-              faithfulness  answer_relevancy  context_precision  context_recall
-爱因斯坦        1.000000          0.449876           1.000000             1.0
-量子力学        0.750000          0.901124           0.583333             0.5
-光合作用        0.666667          0.826652           1.000000             0.0
+            faithfulness  answer_relevancy  context_precision  context_recall
+爱因斯坦      1.000000          0.449876           1.000000             1.0
+量子力学      0.750000          0.901124           0.583333             0.5
+光合作用      0.666667          0.826652           1.000000             0.0
 
 各指标平均分:
   faithfulness:       0.8056
@@ -888,6 +1085,7 @@ print(df.to_string(index=<span class="keyword">False</span>))</pre>
   </div>
 </div>
 
+<!-- ========== CH7: TestsetGenerator ========== -->
 <div class="chapter" id="ch7">
   <div class="chapter-header">
     <h2>07 合成测试数据集生成</h2>
@@ -976,7 +1174,6 @@ Generating personas:  3/3 完成
 Generating Scenarios: 2/2 完成
 Generating Samples:   6/6 完成
 
-生成的测试数据集:
 --- 样本 1 ---
 问题: What is 广义相对论?
 参考答案: 广义相对论于1915年提出，将引力解释为时空弯曲的几何效应。
@@ -1006,12 +1203,13 @@ Generating Samples:   6/6 完成
       persona_name, query_style, query_length, synthesizer_name</div>
       <div class="callout callout-success">
         <span class="callout-icon">&#9989;</span>
-        <div><strong>ragas-007 验证通过！</strong>4 篇文档生成了 6 条测试样本，覆盖简单事实型问题（如"什么是波粒二象性"）和跨文档对比型问题（如"量子力学和深度学习有啥关系"）。自动生成的 persona 和 query_style 让问题更自然。</div>
+        <div><strong>ragas-007 验证通过！</strong>4 篇文档生成了 6 条测试样本，覆盖简单事实型问题和跨文档对比型问题。自动生成的 persona 和 query_style 让问题更自然。</div>
       </div>
     </div>
   </div>
 </div>
 
+<!-- ========== CH8: RAG Comparison ========== -->
 <div class="chapter" id="ch8">
   <div class="chapter-header">
     <h2>08 Naive RAG vs Reranked RAG 对比</h2>
@@ -1096,6 +1294,11 @@ Context Precision: Naive=0.6667, Reranked=0.6667
       </div>
     </div>
   </div>
+
+  <div class="celebration">
+    <h3>教程完成</h3>
+    <p>恭喜！你已经系统掌握了 RAGAS 评估框架的核心指标、批量评估、合成数据生成和实战对比。接下来可以尝试更大的知识库、不同的 reranker 或自定义评估指标。</p>
+  </div>
 </div>
 
 </main>
@@ -1107,6 +1310,15 @@ Context Precision: Naive=0.6667, Reranked=0.6667
 
 <script>
 const sidebarData = {
+  ch0: {
+    points: [
+      { title: "RAGAS 是什么", body: "RAG Assessment（RAGAS）是开源的 RAG 系统评估框架。提供 4 个自动化指标，无需人工标注。本教程使用 RAGAS 0.4.3 + 智谱 GLM-4 API。", dot: "dot-purple" },
+      { title: "四大指标速查", body: "Faithfulness: 答案是否忠实于上下文？\nAnswer Relevancy: 答案是否切题？\nContext Precision: 相关上下文是否排前面？\nContext Recall: 该检索的都检索到了吗？", dot: "dot-blue" },
+      { title: "学习路线", body: "先逐个掌握 4 个核心指标（ch2-5），再用 evaluate() 批量评估（ch6），然后学习自动生成测试数据（ch7），最后做完整 RAG 对比（ch8）。", dot: "dot-green" },
+      { title: "技术栈", body: "Python 3.12 + uv 包管理 + RAGAS 0.4.3 + 智谱 GLM-4-plus/flash + embedding-3 + numpy。使用国内 API，不依赖 OpenAI。", dot: "dot-orange" }
+    ],
+    related: ["RAGAS 官方文档", "RAG 检索增强生成综述", "LangChain RAG 教程"]
+  },
   ch1: {
     points: [
       { title: "RAGAS 是什么", body: "RAG Assessment（RAGAS）是一个开源框架，专门用于评估 RAG（检索增强生成）系统的质量。它提供了一系列自动化指标，无需人工标注即可评估系统性能。", dot: "dot-purple" },
@@ -1128,7 +1340,7 @@ const sidebarData = {
   ch3: {
     points: [
       { title: "Answer Relevancy 含义", body: "衡量 answer 与 question 的语义相关度。答非所问得低分。注意：高相关性 ≠ 高忠实度。", dot: "dot-purple" },
-      { title: "评估方法", body: "从 answer 反向生成可能的问题，计算与原始问题的语义相似度。相似度越高 → 答案越切题。", dot: "dot-blue" }
+      { title: "需要 LLM + Embeddings", body: "LLM 从答案反向生成可能的问题，Embeddings 计算与原始问题的语义相似度。glm-4-flash 反向问题质量不足，需用 glm-4-plus。", dot: "dot-blue" }
     ],
     related: ["RAGAS Answer Relevancy 文档", "BLEU / ROUGE 等传统指标对比"]
   },
@@ -1151,7 +1363,6 @@ const sidebarData = {
       { title: "evaluate() 函数", body: "RAGAS 的核心入口函数。接收 EvaluationDataset + metrics 列表，批量评估所有样本，返回 EvaluationResult。注意：它是同步函数，不需要 await。", dot: "dot-purple" },
       { title: "EvaluationDataset", body: "由多个 SingleTurnSample 组成。每个样本需要 user_input + response + retrieved_contexts + reference。具体需要哪些字段取决于用了哪些指标。", dot: "dot-blue" },
       { title: "结果输出", body: "result.to_pandas() 返回 DataFrame，每行一个样本，每列一个指标。可以直接 print、导出 CSV 或进一步分析。", dot: "dot-green" },
-      { title: "进度显示", body: "show_progress=True 会显示 tqdm 进度条。3 个样本 × 4 个指标 = 12 个评估任务，实际运行约 1 分钟。", dot: "dot-orange" },
       { title: "光合作用案例", body: "context_recall = 0 是因为上下文只提到光反应，但 reference 包含了暗反应（Calvin 循环）。缺少关键信息的上下文被正确检测。", dot: "dot-pink" }
     ],
     related: ["RAGAS evaluate() API 文档", "HuggingFace Datasets 使用指南", "EvaluationResult.to_pandas() 方法"]
@@ -1160,8 +1371,7 @@ const sidebarData = {
     points: [
       { title: "TestsetGenerator", body: "输入 LangChain Document 列表，自动生成 question + reference + contexts 测试集。支持 generate_with_langchain_docs() 和 generate_with_chunks() 两种入口。", dot: "dot-purple" },
       { title: "Transform 管线", body: "内部执行多步 transform：\n1. SummaryExtractor — 提取摘要\n2. CustomNodeFilter — 过滤低质量节点\n3. EmbeddingExtractor — 计算向量\n4. ThemesExtractor — 提取主题\n5. NERExtractor — 命名实体识别\n6. CosineSimilarity/OverlapScore — 构建关系", dot: "dot-blue" },
-      { title: "Personas 生成", body: "TestsetGenerator 会根据文档内容自动生成虚拟用户画像（personas），然后基于 persona 和文档内容合成不同风格的问题。", dot: "dot-green" },
-      { title: "rapidfuzz 依赖", body: "NER 重叠度计算需要 rapidfuzz 库。如果缺少会报 ImportError。安装：pip install rapidfuzz 或 uv add rapidfuzz。", dot: "dot-orange" }
+      { title: "rapidfuzz 依赖", body: "NER 重叠度计算需要 rapidfuzz 库。如果缺少会报 ImportError。安装：uv add rapidfuzz。", dot: "dot-orange" }
     ],
     related: ["RAGAS TestsetGenerator 文档", "LLM-as-Judge 评估方法论"]
   },
@@ -1206,7 +1416,22 @@ document.querySelectorAll('.step-head').forEach(head => {
   head.addEventListener('click', () => { head.closest('.step').classList.toggle('open'); });
 });
 
-renderSidebar('ch1');
+// Copy code button
+document.querySelectorAll('pre').forEach(pre => {
+  const btn = document.createElement('button');
+  btn.className = 'copy-btn';
+  btn.textContent = 'Copy';
+  btn.onclick = function() {
+    const text = pre.textContent.replace('Copy','').trim();
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+    });
+  };
+  pre.appendChild(btn);
+});
+
+renderSidebar('ch0');
 </script>
 
 </body>

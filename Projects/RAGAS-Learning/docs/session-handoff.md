@@ -2,29 +2,27 @@
 
 ## 当前已验证
 
-- 现在明确可用的部分：Harness 文件骨架就位
-- 这轮实际跑过的验证：确认目录结构正确
+- 现在明确可用的部分：ragas-001~004 全部验证通过
+- 这轮实际跑过的验证：添加 requirements.txt，更新说明文档
 
 ## 本轮改动
 
-- 新增了哪些代码或行为：创建 Projects/RAGAS-Learning/ 子项目目录
-- 基础设施或 harness 发生了哪些变化：CLAUDE.md, AGENTS.md, feature_list.json, claude-progress.md, init.sh, session-handoff.md, clean-state-checklist.md, evaluator-rubric.md, quality-document.md 全部就位
+- 新增了哪些代码或行为：添加 `requirements.txt`（子项目直接依赖清单）
+- 基础设施或 harness 发生了哪些变化：CLAUDE.md、AGENTS.md、session-handoff.md、quality-document.md 同步更新
 
 ## 仍损坏或未验证
 
-- 已知缺陷：ragas 尚未安装，依赖兼容性未知
-- 未验证路径：所有 8 个 demo 尚未开始
-- 下一轮会话需要注意的风险：ragas 与现有 langchain 版本可能有冲突
+- 未验证路径：ragas-005~008 尚未开始
+- 下一轮会话需要注意的风险：推理模型的思考输出会破坏 instructor JSON 解析，必须用非推理模型
 
 ## 下一步最佳动作
 
-- 最高优先级未完成功能：ragas-001 — RAGAS 环境搭建与基础 import 验证
-- 为什么它是下一步：所有后续 demo 都依赖 ragas 能正常 import
-- 什么结果才算 passing：`python -c "import ragas; print(ragas.__version__)"` 无报错
-- 这一步中哪些东西不要动：不要动仓库根目录的依赖配置，ragas 应该通过 uv add 加入
+- 最高优先级未完成功能：ragas-005 — Context Recall demo
+- 为什么它是下一步：按顺序学习，Context Recall 是第四个核心指标
+- 什么结果才算 passing：高召回用例得分 > 低召回用例
 
 ## 命令
 
 - 启动命令：`cd Projects/RAGAS-Learning && ./init.sh`
+- 备用安装：`pip install -r requirements.txt`
 - 验证命令：`python -c "import ragas; print(ragas.__version__)"`
-- 定向调试命令：`pip show ragas` / `python -c "import ragas; print(dir(ragas))"`

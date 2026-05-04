@@ -28,6 +28,7 @@
 - `feature_list.json`
 - `claude-progress.md`
 - `init.sh`
+- `requirements.txt` — 子项目直接依赖清单（`pip install -r requirements.txt`）
 - 需要简短交接时使用 `session-handoff.md`
 
 ## 完成门槛

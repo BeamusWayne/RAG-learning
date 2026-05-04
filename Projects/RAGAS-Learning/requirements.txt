@@ -1,0 +1,20 @@
+# RAGAS-Learning direct dependencies
+# Install: pip install -r requirements.txt
+
+# Core evaluation framework
+ragas>=0.4.3
+
+# LLM & Embeddings (OpenAI-compatible API)
+openai>=2.21.0
+langchain>=1.2.10
+langchain-openai>=1.1.10
+langchain-community>=0.4.1
+
+# Dataset handling
+datasets>=4.8.5
+
+# Environment config
+python-dotenv>=1.2.1
+
+# Compatibility constraint (instructor 1.15.1 breaks with mistralai 2.x)
+mistralai<2

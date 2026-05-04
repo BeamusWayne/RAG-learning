@@ -11,6 +11,7 @@
 3. 读取 `feature_list.json`，选择优先级最高的未完成功能。
 4. 回到仓库根 `cd ../../../`，用 `git log --oneline -5` 看最近提交。
 5. 回到本目录，运行 `./init.sh`。
+   - 备用：`pip install -r requirements.txt`（不使用 uv 时）
 6. 在开始新功能前，先跑必需的 smoke test。
 
 如果基础验证一开始就失败，先修基础状态，不要在坏的起点上继续叠新功能。
@@ -28,6 +29,7 @@
 - `feature_list.json`：功能状态的唯一事实来源
 - `claude-progress.md`：会话进度和当前已验证状态
 - `init.sh`：统一的启动与验证入口
+- `requirements.txt`：子项目直接依赖清单（备用安装方式，主流程走 `uv sync`）
 - `session-handoff.md`：较长会话可选的交接摘要
 
 ## 完成定义
