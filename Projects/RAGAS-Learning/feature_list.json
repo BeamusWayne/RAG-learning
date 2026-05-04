@@ -78,14 +78,18 @@
       "area": "metrics",
       "title": "Context Precision（上下文精度）学习 demo",
       "user_visible_behavior": "运行 demo_context_precision.py，输入 question + contexts + ground_truth，输出 context_precision 分数。展示相关上下文排名靠前 vs 靠后的对比。",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "cd Projects/RAGAS-Learning && python demos/demo_context_precision.py",
         "确认输出两个用例的 context_precision 分数。",
         "确认相关上下文排名靠前的用例得分更高。"
       ],
-      "evidence": [],
-      "notes": "Context Precision 衡量检索到的上下文中相关内容是否排名靠前。"
+      "evidence": [
+        "高精度（相关排第一）得分 1.0000",
+        "低精度（相关排最后）得分 0.3333",
+        "使用 glm-4-plus 作为评估 LLM"
+      ],
+      "notes": "Context Precision 衡量检索到的上下文中相关内容是否排名靠前。只需 LLM，不需要 Embeddings。"
     },
     {
       "id": "ragas-005",

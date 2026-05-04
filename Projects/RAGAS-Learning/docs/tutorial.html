@@ -336,7 +336,7 @@
     </div>
     <div class="nav-item" data-ch="ch4">
       <span>04 Context Precision</span>
-      <span class="badge badge-pending">TODO</span>
+      <span class="badge badge-passing">PASS</span>
     </div>
     <div class="nav-item" data-ch="ch5">
       <span>05 Context Recall</span>
@@ -653,12 +653,67 @@ score = <span class="keyword">await</span> scorer.single_turn_ascore(sample)</pr
   <div class="chapter-header">
     <h2>04 Context Precision（上下文精度）</h2>
     <span class="tag tag-metrics">METRICS</span>
-    <span class="badge badge-pending" style="font-size:12px;padding:3px 10px;">TODO</span>
+    <span class="badge badge-passing" style="font-size:12px;padding:3px 10px;">PASSING</span>
     <p class="desc">Context Precision 衡量检索到的上下文中，相关内容是否排名靠前。好的检索系统应该把最相关的片段排在前面。</p>
   </div>
-  <div class="callout callout-info">
-    <span class="callout-icon">&#128640;</span>
-    <div>本章节将在 ragas-004 阶段完成。</div>
+
+  <div class="step open">
+    <div class="step-head">
+      <div class="step-num done">1</div>
+      <span class="step-title">核心原理</span>
+      <span class="step-arrow">&#9654;</span>
+    </div>
+    <div class="step-body">
+      <p>检索系统返回的上下文是有序的。Context Precision 关注：<strong>相关上下文是否排在前面？</strong></p>
+      <p>LLM 逐个判断每个上下文是否与问题相关，然后根据排名位置计算加权分数。排在前面的相关上下文权重更高。</p>
+      <div class="callout callout-info">
+        <span class="callout-icon">&#128218;</span>
+        <div>这个指标只需要 LLM，不需要 Embeddings。所需的输入列：<code class="inline-code">user_input</code> + <code class="inline-code">reference</code>（标准答案）+ <code class="inline-code">retrieved_contexts</code>。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step open">
+    <div class="step-head">
+      <div class="step-num done">2</div>
+      <span class="step-title">完整源码</span>
+      <span class="step-arrow">&#9654;</span>
+    </div>
+    <div class="step-body">
+      <pre><span class="keyword">from</span> ragas.dataset_schema <span class="keyword">import</span> SingleTurnSample
+<span class="keyword">from</span> ragas.metrics._context_precision <span class="keyword">import</span> ContextPrecision
+
+<span class="comment"># 相关上下文排第一 → 高精度</span>
+sample_high = SingleTurnSample(
+    user_input=<span class="string">"相对论是谁提出的？"</span>,
+    reference=<span class="string">"相对论由爱因斯坦提出。"</span>,
+    retrieved_contexts=[
+        <span class="string">"爱因斯坦于1905年提出狭义相对论..."</span>,  <span class="comment"># ✓ 相关，排第一</span>
+        <span class="string">"牛顿经典力学在高速下不适用..."</span>,       <span class="comment"># ✗ 不相关</span>
+        <span class="string">"量子力学研究微观粒子行为..."</span>,           <span class="comment"># ✗ 不相关</span>
+    ],
+)
+scorer = ContextPrecision(llm=llm)
+score = <span class="keyword">await</span> scorer.single_turn_ascore(sample_high)
+<span class="comment"># score = 1.0000</span></pre>
+    </div>
+  </div>
+
+  <div class="step open">
+    <div class="step-head">
+      <div class="step-num done">3</div>
+      <span class="step-title">运行结果</span>
+      <span class="step-arrow">&#9654;</span>
+    </div>
+    <div class="step-body">
+      <div class="output">高精度（相关排第一）: 1.0000
+低精度（相关排最后）: 0.3333
+
+验证通过: 相关上下文排前面的用例得分更高</div>
+      <div class="callout callout-success">
+        <span class="callout-icon">&#9989;</span>
+        <div><strong>ragas-004 验证通过！</strong>相关排第一得分 1.0，排最后得分 0.33（1/3）。完美体现排名对分数的影响。</div>
+      </div>
   </div>
 </div>
 
