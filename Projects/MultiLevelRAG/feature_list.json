@@ -1,0 +1,111 @@
+{
+  "project": "MultiLevelRAG",
+  "description": "多层级 RAG 对比平台 — 意图路由 × 五种策略 × Streamlit UI",
+  "last_updated": "2026-05-08",
+  "features": [
+    {
+      "id": "F01",
+      "name": "核心基础设施",
+      "description": "config / LLM工厂 / Embedding工厂 / Chroma向量库",
+      "files": ["config.py", "core/llm.py", "core/embeddings.py", "core/vector_store.py"],
+      "status": "passing",
+      "verified": "2026-05-08"
+    },
+    {
+      "id": "F02",
+      "name": "知识库加载",
+      "description": "支持 txt/pdf/md 文件加载与向量化",
+      "files": ["knowledge_loader.py"],
+      "status": "passing",
+      "verified": "2026-05-08"
+    },
+    {
+      "id": "F03",
+      "name": "Baseline RAG 策略",
+      "description": "标准向量检索 + LLM 生成",
+      "files": ["strategies/baseline_rag.py"],
+      "status": "passing",
+      "verified": "2026-05-08"
+    },
+    {
+      "id": "F04",
+      "name": "HyDE RAG 策略",
+      "description": "假设文档嵌入检索",
+      "files": ["strategies/hyde_rag.py"],
+      "status": "passing",
+      "verified": "2026-05-08"
+    },
+    {
+      "id": "F05",
+      "name": "RAG Fusion 策略",
+      "description": "多查询扩展 + RRF 融合排名",
+      "files": ["strategies/fusion_rag.py"],
+      "status": "passing",
+      "verified": "2026-05-08"
+    },
+    {
+      "id": "F06",
+      "name": "CRAG 策略",
+      "description": "纠正式 RAG，带相关性评分与分支决策",
+      "files": ["strategies/crag.py"],
+      "status": "passing",
+      "verified": "2026-05-08"
+    },
+    {
+      "id": "F07",
+      "name": "GraphRAG 策略",
+      "description": "NetworkX 知识图谱 + 向量融合检索",
+      "files": ["strategies/graph_rag.py"],
+      "status": "passing",
+      "verified": "2026-05-08"
+    },
+    {
+      "id": "F08",
+      "name": "意图路由器",
+      "description": "LLM 分类 → 策略选择 + 统一 dispatch",
+      "files": ["router.py"],
+      "status": "passing",
+      "verified": "2026-05-08"
+    },
+    {
+      "id": "F09",
+      "name": "全策略并发对比",
+      "description": "comparator.py 并行执行所有策略并对比",
+      "files": ["evaluation/comparator.py"],
+      "status": "passing",
+      "verified": "2026-05-08"
+    },
+    {
+      "id": "F10",
+      "name": "Streamlit 前端",
+      "description": "赛博朋克暗色 UI，文档上传/策略对比/流程可视化",
+      "files": ["app.py"],
+      "status": "passing",
+      "verified": "2026-05-08"
+    },
+    {
+      "id": "F11",
+      "name": "BM25 混合检索",
+      "description": "加入 BM25 关键词检索，与向量检索混合",
+      "status": "pending"
+    },
+    {
+      "id": "F12",
+      "name": "Cross-encoder 重排序",
+      "description": "sentence-transformers/ms-marco 重排序",
+      "status": "pending"
+    },
+    {
+      "id": "F13",
+      "name": "RAGAS 评估集成",
+      "description": "集成 RAGAS 评估框架（忠实度/相关性/召回）",
+      "status": "pending"
+    },
+    {
+      "id": "F14",
+      "name": "流式输出",
+      "description": "SSE 流式输出支持",
+      "status": "pending"
+    }
+  ]
+}
