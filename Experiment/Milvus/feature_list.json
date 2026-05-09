@@ -1,0 +1,103 @@
+{
+  "project": "Milvus+RAG学习路径",
+  "last_updated": "2026-05-06",
+  "rules": {
+    "single_active_feature": true,
+    "passing_requires_evidence": true,
+    "do_not_skip_verification": true
+  },
+  "status_legend": {
+    "not_started": "功能还没开始做。",
+    "in_progress": "这个功能是当前唯一正在进行的任务。",
+    "blocked": "因为已记录的阻塞问题，当前无法继续推进。",
+    "passing": "要求的验证已经通过，并且证据已经记录。"
+  },
+  "features": [
+    {
+      "id": "mvp-01",
+      "priority": 1,
+      "area": "core",
+      "title": "同步MVP - 最简Milvus连接",
+      "user_visible_behavior": "能够连接Milvus并执行基本的向量插入和搜索。",
+      "status": "completed",
+      "verification": [
+        "运行 python milvus_mvp_01_sync.py",
+        "确认能够创建collection",
+        "确认能够插入向量",
+        "确认能够进行搜索"
+      ],
+      "evidence": ["文件已创建: milvus_mvp_01_sync.py (5067 bytes)"],
+      "notes": "包含连接、创建collection、插入向量、搜索的基本API演示"
+    },
+    {
+      "id": "mvp-02",
+      "priority": 2,
+      "area": "core",
+      "title": "异步支持 - 异步Milvus客户端",
+      "user_visible_behavior": "使用asyncio实现非阻塞的Milvus操作。",
+      "status": "completed",
+      "verification": [
+        "运行 python milvus_mvp_02_async.py",
+        "确认异步插入和搜索正常工作"
+      ],
+      "evidence": ["文件已创建: milvus_mvp_02_async.py (6791 bytes)"],
+      "notes": "包含AsyncMilvusConnection、AsyncCollection、并发搜索、批量操作演示"
+    },
+    {
+      "id": "mvp-03",
+      "priority": 3,
+      "area": "rag",
+      "title": "基础RAG流程",
+      "user_visible_behavior": "文档加载->分词->向量化->存储->检索->生成。",
+      "status": "completed",
+      "verification": [
+        "运行 python milvus_mvp_03_rag_basic.py",
+        "确认RAG流程端到端工作"
+      ],
+      "evidence": ["文件已创建: milvus_mvp_03_rag_basic.py (12250 bytes)"],
+      "notes": "包含SimpleDocumentLoader、TextChunker、MockEmbedder、AsyncRAG、完整RAG流程演示"
+    },
+    {
+      "id": "mvp-04",
+      "priority": 4,
+      "area": "performance",
+      "title": "批量处理优化",
+      "user_visible_behavior": "支持批量插入和批量搜索，提升吞吐量。",
+      "status": "completed",
+      "verification": [
+        "运行 python milvus_mvp_04_batch.py",
+        "确认批量操作性能提升"
+      ],
+      "evidence": ["文件已创建: milvus_mvp_04_batch.py (12184 bytes)"],
+      "notes": "包含PerformanceMetrics、BatchProcessor、BatchEmbedder、批量摄入演示"
+    },
+    {
+      "id": "mvp-05",
+      "priority": 5,
+      "area": "enterprise",
+      "title": "企业级特性 - 重试/熔断/缓存",
+      "user_visible_behavior": "添加重试机制、熔断器和结果缓存。",
+      "status": "completed",
+      "verification": [
+        "运行 python milvus_mvp_05_enterprise.py",
+        "确认企业级特性正常工作"
+      ],
+      "evidence": ["文件已创建: milvus_mvp_05_enterprise.py (15953 bytes)"],
+      "notes": "包含CircuitBreaker、LRUCache、RateLimiter、RetryMilvusClient、EnterpriseRAG"
+    },
+    {
+      "id": "mvp-06",
+      "priority": 6,
+      "area": "production",
+      "title": "生产级高性能架构",
+      "user_visible_behavior": "完整的生产级Milvus+RAG系统。",
+      "status": "completed",
+      "verification": [
+        "运行 python milvus_mvp_06_production.py",
+        "确认所有生产级特性正常工作"
+      ],
+      "evidence": ["文件已创建: milvus_mvp_06_production.py (26526 bytes)"],
+      "notes": "包含Config、MetricsCollector、MilvusConnectionPool、AsyncTaskQueue、CollectionManager、ProductionRAGService"
+    }
+  ]
+}

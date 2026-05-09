@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Milvus 向量数据库教程 - 从入门到实践</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f7f9fc;
+            --bg-sidebar: #1a1a2e;
+            --text-primary: #1a1a2e;
+            --text-secondary: #6b7280;
+            --text-light: #f0f0f0;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --border: #e5e7eb;
+            --code-bg: #1e1e2e;
+            --code-text: #e0e0e0;
+            --card-bg: #ffffff;
+            --section-title: #1a1a2e;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1e1e28;
+            --bg-secondary: #282834;
+            --text-primary: #e8e8ec;
+            --text-secondary: #a0a0b0;
+            --border: #3a3a4a;
+            --code-bg: #16161e;
+            --code-text: #d0d0d8;
+            --card-bg: #282834;
+            --section-title: linear-gradient(135deg, #e8e8ec, #818cf8);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .app { display: flex; min-height: 100vh; }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-sidebar);
+            color: var(--text-light);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 24px 0;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 0 24px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #6366f1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-logo span { color: #fff; }
+
+        .sidebar-subtitle {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 8px;
+        }
+
+        .nav-section { padding: 16px 0; }
+
+        .nav-section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #888899;
+            padding: 0 24px;
+            margin-bottom: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 24px;
+            color: #a0a0b0;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: #fff;
+        }
+
+        .nav-item.active {
+            background: rgba(99, 102, 241, 0.2);
+            color: #6366f1;
+            border-left-color: #6366f1;
+        }
+
+        .nav-icon { width: 20px; height: 20px; margin-right: 12px; }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 3px;
+            background: rgba(255,255,255,0.1);
+            z-index: 101;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6366f1, #818cf8);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 32px 48px;
+            max-width: 900px;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            z-index: 50;
+        }
+
+        .section {
+            margin-bottom: 64px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-number {
+            font-size: 12px;
+            color: #6366f1;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .section-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--section-title);
+            -webkit-text-fill-color: unset;
+        }
+
+        [data-theme="dark"] .section-title {
+            background: linear-gradient(135deg, #e8e8ec, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-intro {
+            color: var(--text-secondary);
+            font-size: 16px;
+            margin-bottom: 32px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        [data-theme="dark"] .card p,
+        [data-theme="dark"] .card-title + p {
+            color: #b0b0c0;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-primary);
+        }
+
+        .card-badge {
+            font-size: 10px;
+            padding: 4px 8px;
+            background: #6366f1;
+            color: #fff;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .code-block {
+            background: var(--code-bg);
+            border-radius: 8px;
+            margin: 16px 0;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .code-lang {
+            font-size: 12px;
+            color: #9ca3af;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .copy-btn {
+            background: rgba(99, 102, 241, 0.2);
+            border: none;
+            color: #a0a0b0;
+            padding: 4px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(99, 102, 241, 0.4);
+            color: #fff;
+        }
+
+        .code-content {
+            padding: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--code-text);
+            overflow-x: auto;
+        }
+
+        .code-content code { display: block; white-space: pre; }
+
+        .output {
+            background: rgba(16, 185, 129, 0.1);
+            border-top: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 12px 16px;
+            font-size: 12px;
+            color: #10b981;
+        }
+
+        [data-theme="dark"] .output {
+            background: rgba(16, 185, 129, 0.08);
+            color: #34d399;
+        }
+
+        [data-theme="dark"] .pagination { border-top-color: var(--border); }
+        [data-theme="dark"] .page-btn { background: var(--card-bg); color: var(--text-primary); }
+
+        .arch-diagram {
+            background: linear-gradient(135deg, #1a1a2e 0%, #2d2d4a 100%);
+            border-radius: 12px;
+            padding: 32px;
+            margin: 24px 0;
+        }
+
+        [data-theme="dark"] .arch-diagram {
+            background: linear-gradient(135deg, #12121a 0%, #1a1a2a 100%);
+            border: 1px solid #3a3a4a;
+        }
+
+        [data-theme="dark"] .arch-box {
+            background: rgba(99, 102, 241, 0.15);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        [data-theme="dark"] .arch-box.highlight {
+            background: rgba(99, 102, 241, 0.25);
+            border-color: #6366f1;
+        }
+
+        .arch-layer {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .arch-box {
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            border-radius: 8px;
+            padding: 16px 24px;
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .arch-box.highlight {
+            background: rgba(99, 102, 241, 0.4);
+            border-color: #6366f1;
+            transform: scale(1.05);
+        }
+
+        .arch-label { font-size: 11px; color: #9ca3af; margin-bottom: 4px; }
+        .arch-name { font-size: 14px; font-weight: 600; color: #fff; }
+
+        .arch-arrow { text-align: center; color: #6366f1; font-size: 20px; margin: 8px 0; }
+
+        .info-box {
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin: 16px 0;
+            display: flex;
+            gap: 12px;
+        }
+
+        .info-box.tip { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); }
+        .info-box.warning { background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); }
+        .info-box.info { background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.4); }
+
+        [data-theme="dark"] .info-box.tip { background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); }
+        [data-theme="dark"] .info-box.warning { background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.3); }
+        [data-theme="dark"] .info-box.info { background: rgba(99, 102, 241, 0.1); border-color: rgba(99, 102, 241, 0.3); }
+
+        .info-icon { font-size: 20px; flex-shrink: 0; }
+        .info-content { font-size: 14px; color: var(--text-primary); }
+        .info-content strong { color: var(--text-primary); }
+
+        .comparison-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+        .comparison-table th, .comparison-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); color: var(--text-primary); }
+        .comparison-table th { background: var(--bg-secondary); font-weight: 600; font-size: 13px; }
+        .comparison-table tr:hover { background: var(--bg-secondary); }
+        .comparison-table tr:nth-child(even) { background: rgba(99, 102, 241, 0.03); }
+
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin: 24px 0; }
+        .feature-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 20px; text-align: center; }
+        .feature-icon { font-size: 32px; margin-bottom: 12px; }
+        .feature-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary); }
+        .feature-desc { font-size: 13px; color: var(--text-secondary); }
+
+        .pagination { display: flex; justify-content: space-between; margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border); }
+        .page-btn { padding: 12px 24px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; text-decoration: none; color: var(--text-primary); }
+        .page-btn:hover { background: #6366f1; color: #fff; border-color: #6366f1; }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 24px; }
+            .menu-toggle { display: block; }
+        }
+
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 200;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        code { background: var(--bg-secondary); padding: 2px 6px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.9em; }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 4px; }
+
+        h2 { font-size: 24px; margin: 32px 0 16px; color: var(--text-primary); }
+
+        [data-theme="dark"] code {
+            background: rgba(99, 102, 241, 0.15);
+            color: #a0a0ff;
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+
+    <div class="app">
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                        <rect width="32" height="32" rx="8" fill="#6366f1"/>
+                        <path d="M8 24L16 8L24 24H8Z" fill="white"/>
+                    </svg>
+                    <span>Milvus</span>
+                </div>
+                <div class="sidebar-subtitle">向量数据库学习教程</div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">入门</div>
+                <div class="nav-item active" data-section="intro">🚀 认识 Milvus</div>
+                <div class="nav-item" data-section="install">⚡ 快速安装</div>
+                <div class="nav-item" data-section="first-app">💡 第一个应用</div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">核心概念</div>
+                <div class="nav-item" data-section="collection">📦 Collection 集合</div>
+                <div class="nav-item" data-section="schema">📋 Schema 结构</div>
+                <div class="nav-item" data-section="index">🔍 索引类型</div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">数据操作</div>
+                <div class="nav-item" data-section="insert">➕ 插入数据</div>
+                <div class="nav-item" data-section="search">🎯 向量搜索</div>
+                <div class="nav-item" data-section="filter">🔎 元数据过滤</div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">深入实践</div>
+                <div class="nav-item" data-section="architecture">🏗️ 架构解析</div>
+                <div class="nav-item" data-section="production">⚙️ 生产部署</div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <span id="themeIcon">🌙</span>
+                <span id="themeText">深色模式</span>
+            </button>
+
+            <!-- Section 1: Introduction -->
+            <section class="section" id="intro">
+                <div class="section-number">01 / 入门</div>
+                <h1 class="section-title">认识 Milvus</h1>
+                <p class="section-intro">
+                    Milvus 是全球最流行的开源向量数据库，专为 AI 应用设计。它能存储和搜索数十亿向量，让你轻松实现语义搜索、推荐系统、RAG 等功能。
+                </p>
+
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon">⚡</div>
+                        <div class="feature-title">超高速检索</div>
+                        <div class="feature-desc">十亿向量毫秒级响应，支持 GPU 加速</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">🔄</div>
+                        <div class="feature-title">灵活扩展</div>
+                        <div class="feature-desc">从小 demo 到生产集群，无缝扩展</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">🔗</div>
+                        <div class="feature-title">多模态支持</div>
+                        <div class="feature-desc">文本、图像、音频、视频向量统一存储</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">🛠️</div>
+                        <div class="feature-title">丰富接口</div>
+                        <div class="feature-desc">Python、Java、Go、RESTful 多语言SDK</div>
+                    </div>
+                </div>
+
+                <div class="info-box info">
+                    <div class="info-icon">💡</div>
+                    <div class="info-content">
+                        <strong>什么时候用 Milvus？</strong><br>
+                        当你需要搜索"相似的内容"时，比如：找相似图片、搜相似商品、做语义搜索、实现 RAG（检索增强生成）、推荐系统等。
+                    </div>
+                </div>
+
+                <h2>Milvus 应用场景</h2>
+                <table class="comparison-table">
+                    <thead>
+                        <tr><th>场景</th><th>说明</th><th>效果</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>RAG</td><td>结合大语言模型，实现知识增强回答</td><td>准确率提升 40%+</td></tr>
+                        <tr><td>语义搜索</td><td>理解查询意图，不只是关键词匹配</td><td>召回率提升 60%+</td></tr>
+                        <tr><td>相似图片搜索</td><td>以图搜图，找相似产品/素材</td><td>毫秒级响应</td></tr>
+                        <tr><td>推荐系统</td><td>基于用户行为，推荐相似内容</td><td>点击率提升 30%</td></tr>
+                        <tr><td>异常检测</td><td>找出与正常模式差异大的数据</td><td>实时预警</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Section 2: Installation -->
+            <section class="section" id="install">
+                <div class="section-number">02 / 入门</div>
+                <h1 class="section-title">快速安装</h1>
+                <p class="section-intro">
+                    两种安装方式：轻量版适合学习和开发，生产环境用 Docker 部署。
+                </p>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-badge">推荐</span> Milvus Lite（学习/开发）</div>
+                    <p style="color: var(--text-secondary); margin-bottom: 16px;">
+                        轻量级嵌入版本，直接安装到 Python 项目中，适合本地开发和测试。
+                    </p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-lang">bash</span>
+                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                        </div>
+                        <div class="code-content"><code># 安装 pymilvus（包含 Milvus Lite）
+pip install -U pymilvus
+
+# 可选：安装 embedding 模型支持
+pip install "pymilvus[model]"</code></div>
+                    </div>
+                    <div class="info-box tip">
+                        <div class="info-icon">✓</div>
+                        <div class="info-content">Milvus Lite 会自动创建本地数据库文件，无需额外配置！</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-badge">生产</span> Docker 部署（生产环境）</div>
+                    <p style="color: var(--text-secondary); margin-bottom: 16px;">
+                        使用 Docker 一键启动完整 Milvus 服务，支持高并发和大规模数据。
+                    </p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-lang">bash</span>
+                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                        </div>
+                        <div class="code-content"><code># 下载安装脚本
+curl -sfL https://raw.githubusercontent.com/milvus-io/milvus/master/scripts/standalone_embed.sh -o standalone_embed.sh
+
+# 启动 Milvus
+bash standalone_embed.sh start
+
+# 查看状态
+docker ps | grep milvus</code></div>
+                    </div>
+                    <div class="info-box warning">
+                        <div class="info-icon">⚠️</div>
+                        <div class="info-content">Docker 方式需要至少 4GB 内存，确保你的机器配置足够。</div>
+                    </div>
+                </div>
+
+                <h2>验证安装</h2>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">python</span>
+                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    </div>
+                    <div class="code-content"><code># 验证 Milvus 连接
+from pymilvus import MilvusClient
+
+# 尝试连接（Lite 版本会创建本地文件）
+client = MilvusClient("test.db")
+print("✅ Milvus 连接成功！")</code></div>
+                    <div class="output">✅ Milvus 连接成功！</div>
+                </div>
+            </section>
+
+            <!-- Section 3: First App -->
+            <section class="section" id="first-app">
+                <div class="section-number">03 / 入门</div>
+                <h1 class="section-title">第一个应用：语义搜索</h1>
+                <p class="section-intro">
+                    只需 5 行代码，你就能实现一个语义搜索引擎。让我们从一个完整示例开始。
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">python</span>
+                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    </div>
+                    <div class="code-content"><code>"""
+完整示例：5 分钟实现语义搜索
+"""
+from pymilvus import MilvusClient, model
+
+# 1. 初始化客户端（会自动创建本地数据库）
+client = MilvusClient("semantic_search.db")
+
+# 2. 创建集合（存储向量和文本）
+if client.has_collection("articles"):
+    client.drop_collection("articles")
+
+client.create_collection(
+    collection_name="articles",
+    dimension=768  # 向量维度，与 embedding 模型匹配
+)
+
+# 3. 准备数据（文档 + 向量）
+docs = [
+    "人工智能起源于 1956 年的达特茅斯会议",
+    "图灵是 AI 领域的先驱，被称为人工智能之父",
+    "深度学习在 2012 年的 ImageNet 竞赛中突破性胜出",
+    "Transformer 架构革新了自然语言处理",
+    "ChatGPT 展示了对话式 AI 的巨大潜力"
+]
+
+embedding_fn = model.DefaultEmbeddingFunction()
+vectors = embedding_fn.encode_documents(docs)
+
+data = [{"id": i, "vector": vectors[i], "text": docs[i]} for i in range(len(docs))]
+
+# 4. 插入数据
+client.insert(collection_name="articles", data=data)
+print(f"✅ 插入 {len(data)} 条数据")
+
+# 5. 语义搜索
+query = "谁被称为人工智能之父？"
+query_vector = embedding_fn.encode_queries([query])
+
+results = client.search(
+    collection_name="articles",
+    data=query_vector,
+    limit=2,  # 返回最相似的 2 条
+    output_fields=["text"]
+)
+
+print(f"\n🔍 搜索: {query}")
+print("📄 结果:")
+for result in results[0]:
+    print(f"  - {result['entity']['text']} (相似度: {result['distance']:.3f})")</code></div>
+                    <div class="output">✅ 插入 5 条数据
+
+🔍 搜索: 谁被称为人工智能之父？
+📄 结果:
+  - 图灵是 AI 领域的先驱，被称为人工智能之父 (相似度: 0.852)
+  - 人工智能起源于 1956 年的达特茅斯会议 (相似度: 0.681)</div>
+                </div>
+
+                <div class="info-box info">
+                    <div class="info-icon">🧠</div>
+                    <div class="info-content">
+                        <strong>发生了什么？</strong><br>
+                        1. 文本被转换成 768 维向量<br>
+                        2. 向量存储到 Milvus 集合中<br>
+                        3. 搜索时，查询文本也转换成向量<br>
+                        4. Milvus 找到与查询向量最相似的向量
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Collection -->
+            <section class="section" id="collection">
+                <div class="section-number">04 / 核心概念</div>
+                <h1 class="section-title">Collection 集合</h1>
+                <p class="section-intro">
+                    Collection（集合）是 Milvus 中存储数据的基本单位，类似传统数据库中的表。每个 Collection 包含多条记录（Entity），每条记录有多个字段（Field）。
+                </p>
+
+                <div class="arch-diagram">
+                    <div style="text-align: center; color: #9ca3af; margin-bottom: 16px;">Collection 数据结构示意</div>
+                    <div class="arch-layer">
+                        <div class="arch-box"><div class="arch-label">Field</div><div class="arch-name">id (主键)</div></div>
+                        <div class="arch-box highlight"><div class="arch-label">Field</div><div class="arch-name">vector (向量)</div></div>
+                        <div class="arch-box"><div class="arch-label">Field</div><div class="arch-name">text (文本)</div></div>
+                        <div class="arch-box"><div class="arch-label">Field</div><div class="arch-name">category (分类)</div></div>
+                    </div>
+                    <div class="arch-layer" style="gap: 8px;">
+                        <div class="arch-box" style="padding: 8px 16px;"><div class="arch-name" style="font-size: 12px;">Entity 0</div></div>
+                        <div class="arch-box" style="padding: 8px 16px;"><div class="arch-name" style="font-size: 12px;">Entity 1</div></div>
+                        <div class="arch-box" style="padding: 8px 16px;"><div class="arch-name" style="font-size: 12px;">Entity 2</div></div>
+                        <div class="arch-box" style="padding: 8px 16px;"><div class="arch-name" style="font-size: 12px;">...</div></div>
+                    </div>
+                </div>
+
+                <h2>创建 Collection</h2>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">python</span>
+                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    </div>
+                    <div class="code-content"><code># 方式 1：简化创建（最常用）
+client.create_collection(
+    collection_name="my_collection",
+    dimension=768  # 向量维度
+)
+
+# 方式 2：完整配置（推荐用于生产）
+from pymilvus import CollectionSchema, FieldType, DataType
+
+fields = [
+    FieldType(name="id", dtype=DataType.INT64, is_primary=True),
+    FieldType(name="vector", dtype=DataType.FLOAT_VECTOR, dim=768),
+    FieldType(name="text", dtype=DataType.VARCHAR, max_length=10000),
+    FieldType(name="category", dtype=DataType.VARCHAR, max_length=50)
+]
+
+schema = CollectionSchema(fields=fields, description="我的集合")
+
+client.create_collection(
+    collection_name="my_collection_full",
+    schema=schema,
+    metric_type="COSINE"  # 余弦相似度
+)</code></div>
+                </div>
+
+                <h2>集合操作</h2>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">python</span>
+                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    </div>
+                    <div class="code-content"><code># 查看所有集合
+collections = client.list_collections()
+
+# 检查集合是否存在
+exists = client.has_collection("my_collection")
+
+# 查看集合详情
+info = client.describe_collection("my_collection")
+
+# 删除集合
+client.drop_collection("my_collection")
+
+# 加载集合到内存（搜索前必须）
+client.load_collection("my_collection")
+
+# 释放集合（节省内存）
+client.release_collection("my_collection")</code></div>
+                </div>
+            </section>
+
+            <!-- Section 5: Schema -->
+            <section class="section" id="schema">
+                <div class="section-number">05 / 核心概念</div>
+                <h1 class="section-title">Schema 结构设计</h1>
+                <p class="section-intro">
+                    Schema 定义了 Collection 的数据结构，包括字段类型、主键设置、索引策略等。好的 Schema 设计能显著提升查询性能。
+                </p>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr><th>数据类型</th><th>说明</th><th>示例</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>INT64</code></td><td>64位整数主键</td><td>1, 2, 3, ...</td></tr>
+                        <tr><td><code>VARCHAR</code></td><td>字符串，可设最大长度</td><td>"hello", "category"</td></tr>
+                        <tr><td><code>FLOAT_VECTOR</code></td><td>浮点向量，必须指定维度</td><td>[0.1, 0.5, ...] (768维)</td></tr>
+                        <tr><td><code>BOOL</code></td><td>布尔值</td><td>true, false</td></tr>
+                        <tr><td><code>FLOAT/DOUBLE</code></td><td>浮点数</td><td>1.5, 3.14</td></tr>
+                    </tbody>
+                </table>
+
+                <h2>完整 Schema 示例</h2>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">python</span>
+                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    </div>
+                    <div class="code-content"><code>from pymilvus import CollectionSchema, FieldType, DataType
+
+# 定义字段
+fields = [
+    # 主键字段 - 唯一标识每条记录
+    FieldType(name="id", dtype=DataType.INT64, is_primary=True, auto_id=True),
+
+    # 向量字段 - 用于相似度搜索（必须建索引）
+    FieldType(name="embedding", dtype=DataType.FLOAT_VECTOR, dim=1536),
+
+    # 文本字段 - 用于存储原始文本
+    FieldType(name="content", dtype=DataType.VARCHAR, max_length=5000),
+
+    # 元数据字段 - 用于过滤搜索
+    FieldType(name="category", dtype=DataType.VARCHAR, max_length=100),
+    FieldType(name="created_at", dtype=DataType.INT64),  # Unix 时间戳
+    FieldType(name="views", dtype=DataType.INT64),
+]
+
+# 创建 Schema
+schema = CollectionSchema(
+    fields=fields,
+    description="RAG 知识库集合",
+    enable_dynamic_field=True  # 允许插入未定义的字段
+)
+
+# 创建 Collection
+client.create_collection(
+    collection_name="knowledge_base",
+    schema=schema,
+    metric_type="COSINE",  # 余弦相似度
+    index_type="AUTOINDEX"  # 自动选择最优索引
+)</code></div>
+                </div>
+
+                <div class="info-box tip">
+                    <div class="info-icon">💡</div>
+                    <div class="info-content">
+                        <strong>主键 auto_id=True</strong><br>
+                        设置 auto_id=True 后，插入数据时不需要提供主键，Milvus 会自动生成。这是最推荐的方式。
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: Index -->
+            <section class="section" id="index">
+                <div class="section-number">06 / 核心概念</div>
+                <h1 class="section-title">索引类型</h1>
+                <p class="section-intro">
+                    索引是加速向量搜索的关键。不同的索引类型适用于不同的场景和数据规模。
+                </p>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr><th>索引类型</th><th>适用场景</th><th>内存占用</th><th>搜索速度</th><th>精度</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>FLAT</code></td><td>小数据集，精确搜索</td><td>高</td><td>慢</td><td>100%</td></tr>
+                        <tr><td><code>IVF_FLAT</code></td><td>中等规模，平衡型</td><td>中</td><td>中</td><td>高</td></tr>
+                        <tr><td><code>HNSW</code></td><td>大规模，高性能</td><td>高</td><td>快</td><td>高</td></tr>
+                        <tr><td><code>DISKANN</code></td><td>十亿级，超大规模</td><td>低</td><td>快</td><td>中高</td></tr>
+                        <tr><td><code>AUTOINDEX</code></td><td>自动优化，省心</td><td>自动</td><td>自动</td><td>自动</td></tr>
+                    </tbody>
+                </table>
+
+                <h2>创建索引</h2>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">python</span>
+                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    </div>
+                    <div class="code-content"><code># 方式 1：自动索引（推荐，最省心）
+client.create_index(
+    collection_name="my_collection",
+    field_name="vector",
+    index_type="AUTOINDEX",
+    metric_type="COSINE"
+)
+
+# 方式 2：HNSW 索引（高性能，适合大规模）
+client.create_index(
+    collection_name="my_collection",
+    field_name="vector",
+    index_type="HNSW",
+    params={"M": 16, "efConstruction": 200},
+    metric_type="COSINE"
+)
+
+# 方式 3：IVF_FLAT 索引（平衡之选）
+client.create_index(
+    collection_name="my_collection",
+    field_name="vector",
+    index_type="IVF_FLAT",
+    params={"nlist": 1024},
+    metric_type="COSINE"
+)</code></div>
+                </div>
+
+                <div class="info-box warning">
+                    <div class="info-icon">⚠️</div>
+                    <div class="info-content">
+                        <strong>索引参数说明</strong><br>
+                        <code>M</code>: HNSW 邻居数，更高 = 更精确但更占内存<br>
+                        <code>efConstruction</code>: 构建时的搜索深度<br>
+                        <code>nlist</code>: IVF 聚类中心数
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 7: Insert -->
+            <section class="section" id="insert">
+                <div class="section-number">07 / 数据操作</div>
+                <h1 class="section-title">插入数据</h1>
+                <p class="section-intro">
+                    数据以 Entity（实体）形式插入集合。每个 Entity 包含所有字段定义的值。
+                </p>
+
+                <h2>基本插入</h2>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">python</span>
+                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    </div>
+                    <div class="code-content"><code># 准备数据（每条是一个 dict）
+data = [
+    {"id": 1, "vector": [0.1, 0.2, ...], "text": "第一个文档"},
+    {"id": 2, "vector": [0.3, 0.4, ...], "text": "第二个文档"},
+]
+
+# 插入数据
+result = client.insert(
+    collection_name="my_collection",
+    data=data
+)
+
+print(f"插入数量: {result['insert_count']}")
+print(f"生成的 ID: {result['ids']}")</code></div>
+                </div>
+
+                <h2>批量插入 + 自动 ID</h2>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">python</span>
+                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    </div>
+                    <div class="code-content"><code># 使用 auto_id=True 时，不需要提供 id
+data = [
+    {"vector": [0.1, 0.2, ...], "text": "文档 A", "category": "科技"},
+    {"vector": [0.3, 0.4, ...], "text": "文档 B", "category": "科技"},
+]
+
+result = client.insert(collection_name="my_collection", data=data)
+print(f"自动生成的 ID: {result['ids']}")  # [4, 5, 6]</code></div>
+                </div>
+
+                <h2>Upsert（插入或更新）</h2>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">python</span>
+                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    </div>
+                    <div class="code-content"><code># 如果 id 存在则更新，不存在则插入
+data = [
+    {"id": 1, "vector": [0.9, 0.8, ...], "text": "更新后的文档"},
+]
+
+client.upsert(collection_name="my_collection", data=data)</code></div>
+                </div>
+
+                <h2>删除数据</h2>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">python</span>
+                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    </div>
+                    <div class="code-content"><code># 按 ID 删除
+client.delete(collection_name="my_collection", ids=[1, 2, 3])
+
+# 按条件删除
+client.delete(collection_name="my_collection", filter="category == '科技'")</code></div>
+                </div>
+            </section>
+
+            <!-- Section 8: Search -->
+            <section class="section" id="search">
+                <div class="section-number">08 / 数据操作</div>
+                <h1 class="section-title">向量搜索</h1>
+                <p class="section-intro">
+                    向量搜索是 Milvus 的核心功能。它找到与查询向量最相似的向量，返回对应的实体。
+                </p>
+
+                <h2>基础搜索</h2>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">python</span>
+                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    </div>
+                    <div class="code-content"><code># 搜索最相似的 5 条
+query_vector = embedding_fn.encode_queries(["查询文本"])[0]
+
+results = client.search(
+    collection_name="my_collection",
+    data=[query_vector],
+    limit=5,
+    output_fields=["text", "category"]  # 返回哪些字段
+)
+
+# 处理结果
+for result in results[0]:
+    print(f"ID: {result['id']}")
+    print(f"相似度: {result['distance']}")
+    print(f"文本: {result['entity']['text']}")</code></div>
+                </div>
+
+                <h2>批量搜索</h2>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">python</span>
+                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    </div>
+                    <div class="code-content"><code># 同时搜索多个查询向量
+query_vectors = embedding_fn.encode_queries(["第一个查询", "第二个查询"])
+
+results = client.search(
+    collection_name="my_collection",
+    data=query_vectors,
+    limit=3
+)
+
+# results[0] 是第一个查询的结果，results[1] 是第二个</code></div>
+                </div>
+
+                <h2>范围搜索</h2>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">python</span>
+                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    </div>
+                    <div class="code-content"><code># 搜索相似度 >= 0.8 的结果
+results = client.search(
+    collection_name="my_collection",
+    data=[query_vector],
+    limit=10,
+    search_params={"radius": 0.8, "range_filter": 1.0}
+)</code></div>
+                </div>
+
+                <div class="info-box info">
+                    <div class="info-icon">📊</div>
+                    <div class="info-content">
+                        <strong>搜索结果解读</strong><br>
+                        <code>distance</code>: 相似度距离，值越小表示越相似（COSINE）<br>
+                        <code>id</code>: 匹配的实体主键<br>
+                        <code>entity</code>: 返回的字段值
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 9: Filter -->
+            <section class="section" id="filter">
+                <div class="section-number">09 / 数据操作</div>
+                <h1 class="section-title">元数据过滤</h1>
+                <p class="section-intro">
+                    在向量搜索的同时，可以根据元数据字段过滤结果，实现更精准的检索。
+                </p>
+
+                <h2>过滤表达式</h2>
+                <table class="comparison-table">
+                    <thead>
+                        <tr><th>操作符</th><th>说明</th><th>示例</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>==</code></td><td>等于</td><td><code>category == 'tech'</code></td></tr>
+                        <tr><td><code>!=</code></td><td>不等于</td><td><code>status != 'deleted'</code></td></tr>
+                        <tr><td><code>></code></td><td>大于</td><td><code>price > 100</code></td></tr>
+                        <tr><td><code><</code></td><td>小于</td><td><code>views < 1000</code></td></tr>
+                        <tr><td><code>in</code></td><td>在集合中</td><td><code>category in ['tech', 'science']</code></td></tr>
+                        <tr><td><code>and</code></td><td>且</td><td><code>(category == 'tech') and (views > 100)</code></td></tr>
+                        <tr><td><code>or</code></td><td>或</td><td><code>(category == 'tech') or (category == 'science')</code></td></tr>
+                    </tbody>
+                </table>
+
+                <h2>带过滤的搜索</h2>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">python</span>
+                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    </div>
+                    <div class="code-content"><code># 只搜索分类为"科技"的文档
+results = client.search(
+    collection_name="my_collection",
+    data=[query_vector],
+    filter="category == '科技'",
+    limit=5,
+    output_fields=["text", "category", "created_at"]
+)
+
+# 组合过滤：科技分类 且 浏览量大于 100
+results = client.search(
+    collection_name="my_collection",
+    data=[query_vector],
+    filter="(category == '科技') and (views > 100)",
+    limit=5
+)
+
+# 多值过滤
+results = client.search(
+    collection_name="my_collection",
+    data=[query_vector],
+    filter="category in ['科技', '经济', '文化']",
+    limit=10
+)</code></div>
+                </div>
+
+                <h2>标量查询（不带向量搜索）</h2>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">python</span>
+                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    </div>
+                    <div class="code-content"><code># 查询所有符合条件的记录
+results = client.query(
+    collection_name="my_collection",
+    filter="category == '科技' and views > 100",
+    output_fields=["id", "text", "category", "views"]
+)
+
+# 按 ID 查询
+results = client.query(
+    collection_name="my_collection",
+    ids=[1, 2, 3],
+    output_fields=["text", "category"]
+)</code></div>
+                </div>
+            </section>
+
+            <!-- Section 10: Architecture -->
+            <section class="section" id="architecture">
+                <div class="section-number">10 / 深入实践</div>
+                <h1 class="section-title">架构解析</h1>
+                <p class="section-intro">
+                    Milvus 采用云原生设计，四层架构相互独立，支持水平扩展。
+                </p>
+
+                <div class="arch-diagram">
+                    <div class="arch-layer">
+                        <div class="arch-box highlight"><div class="arch-label">Layer 1</div><div class="arch-name">接入层 (Proxy)</div></div>
+                        <div class="arch-box highlight"><div class="arch-label">Layer 2</div><div class="arch-name">协调器 (Coordinator)</div></div>
+                    </div>
+                    <div class="arch-arrow">↓ ↑</div>
+                    <div class="arch-layer">
+                        <div class="arch-box"><div class="arch-label">Layer 3</div><div class="arch-name">Query Node</div></div>
+                        <div class="arch-box"><div class="arch-label">Layer 3</div><div class="arch-name">Data Node</div></div>
+                        <div class="arch-box"><div class="arch-label">Layer 3</div><div class="arch-name">Streaming Node</div></div>
+                    </div>
+                    <div class="arch-arrow">↓ ↑</div>
+                    <div class="arch-layer">
+                        <div class="arch-box"><div class="arch-label">Storage</div><div class="arch-name">etcd</div></div>
+                        <div class="arch-box"><div class="arch-label">Storage</div><div class="arch-name">MinIO/S3</div></div>
+                        <div class="arch-box"><div class="arch-label">Storage</div><div class="arch-name">WAL</div></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">接入层 (Access Layer)</div>
+                    <p style="color: var(--text-secondary);">轻量级无状态代理，负责验证客户端请求、聚合和后处理结果。使用负载均衡统一提供服务入口。</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">协调器 (Coordinator)</div>
+                    <p style="color: var(--text-secondary);">
+                        集群大脑，负责维护拓扑结构、调度任务、保证一致性。<br>
+                        • <strong>Root Coord</strong>: 处理 DDL/DCL 请求<br>
+                        • <strong>Query Coord</strong>: 管理查询节点和负载均衡<br>
+                        • <strong>Data Coord</strong>: 管理数据节点和数据视图
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">工作节点 (Worker Nodes)</div>
+                    <p style="color: var(--text-secondary);">
+                        无状态执行器，遵循协调器指令：<br>
+                        • <strong>Query Node</strong>: 搜索历史数据<br>
+                        • <strong>Data Node</strong>: 压缩和建索引<br>
+                        • <strong>Streaming Node</strong>: 处理实时写入
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">存储层 (Storage)</div>
+                    <p style="color: var(--text-secondary);">
+                        持久化数据：<br>
+                        • <strong>etcd</strong>: 元数据（schema、索引配置）<br>
+                        • <strong>对象存储</strong>: 索引文件、日志快照<br>
+                        • <strong>WAL</strong>: 写入前置日志，保证一致性
+                    </p>
+                </div>
+            </section>
+
+            <!-- Section 11: Production -->
+            <section class="section" id="production">
+                <div class="section-number">11 / 深入实践</div>
+                <h1 class="section-title">生产部署</h1>
+                <p class="section-intro">
+                    从本地开发到生产集群，Milvus 提供多种部署方案。
+                </p>
+
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon">💻</div>
+                        <div class="feature-title">Milvus Lite</div>
+                        <div class="feature-desc">嵌入 Python，零配置，适合学习和中小规模</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">🐳</div>
+                        <div class="feature-title">Docker Standalone</div>
+                        <div class="feature-desc">单节点部署，适合中小规模生产</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">☸️</div>
+                        <div class="feature-title">K8s Cluster</div>
+                        <div class="feature-desc">分布式集群，支持高可用和大规模</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">☁️</div>
+                        <div class="feature-title">Zilliz Cloud</div>
+                        <div class="feature-desc">全托管服务，开箱即用，自动扩缩容</div>
+                    </div>
+                </div>
+
+                <h2>Docker 完整部署</h2>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">yaml</span>
+                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    </div>
+                    <div class="code-content"><code># docker-compose.yml
+version: '3.8'
+services:
+  milvus:
+    image: milvusdb/milvus:v2.6.0
+    container_name: milvus
+    ports:
+      - "19530:19530"
+      - "9091:9091"
+    volumes:
+      - ./milvus_data:/var/lib/milvus
+    environment:
+      ETCD_ENDPOINTS: etcd:2379
+      MINIO_ADDRESS: minio:9000
+    depends_on:
+      - etcd
+      - minio
+
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.5
+    container_name: milvus_etcd
+    volumes:
+      - ./etcd_data:/etcd
+
+  minio:
+    image: minio/minio:latest
+    container_name: milvus_minio
+    ports:
+      - "9001:9001"
+    volumes:
+      - ./minio_data:/minio_data</code></div>
+                </div>
+
+                <h2>硬件配置建议</h2>
+                <table class="comparison-table">
+                    <thead>
+                        <tr><th>规模</th><th>向量数量</th><th>CPU</th><th>内存</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>小规模</td><td>< 100万</td><td>4核</td><td>8GB</td></tr>
+                        <tr><td>中规模</td><td>< 1亿</td><td>8核</td><td>32GB</td></tr>
+                        <tr><td>大规模</td><td>> 1亿</td><td>16核+</td><td>64GB+</td></tr>
+                    </tbody>
+                </table>
+
+                <h2>监控与运维</h2>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">bash</span>
+                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    </div>
+                    <div class="code-content"><code># 查看 Milvus 日志
+docker logs milvus
+
+# 使用 Attu Web UI 管理
+# 访问 http://localhost:9091/webui/
+
+# Prometheus 指标
+# 访问 http://localhost:9091/metrics</code></div>
+                </div>
+
+                <div class="info-box tip">
+                    <div class="info-icon">✅</div>
+                    <div class="info-content">
+                        <strong>快速检查清单</strong><br>
+                        □ 内存充足（数据必须加载到内存才能搜索）<br>
+                        □ 防火墙开放 19530 端口<br>
+                        □ 索引已创建（未建索引会很慢）<br>
+                        □ 集合已加载（load_collection）
+                    </div>
+                </div>
+            </section>
+
+            <div class="pagination">
+                <a href="#" class="page-btn">← 上一页</a>
+                <a href="#" class="page-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">返回顶部 ↑</a>
+                <a href="#" class="page-btn">下一页 →</a>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isDark = html.getAttribute('data-theme') === 'dark';
+            html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            document.getElementById('themeIcon').textContent = isDark ? '🌙' : '☀️';
+            document.getElementById('themeText').textContent = isDark ? '深色模式' : '浅色模式';
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        function scrollToSection(id) {
+            const section = document.getElementById(id);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth' });
+                document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+                const navItem = document.querySelector(`[data-section="${id}"]`);
+                if (navItem) navItem.classList.add('active');
+            }
+        }
+
+        function copyCode(btn) {
+            const code = btn.closest('.code-block').querySelector('code').textContent;
+            navigator.clipboard.writeText(code);
+            btn.textContent = '已复制!';
+            setTimeout(() => btn.textContent = '复制', 2000);
+        }
+
+        function updateProgress() {
+            const sections = document.querySelectorAll('.section');
+            let completed = 0;
+            sections.forEach(section => {
+                const rect = section.getBoundingClientRect();
+                if (rect.top < window.innerHeight * 0.5) completed++;
+            });
+            const progress = (completed / sections.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        // Nav click handlers
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const section = this.getAttribute('data-section');
+                if (section) scrollToSection(section);
+            });
+        });
+
+        window.addEventListener('scroll', updateProgress);
+        window.addEventListener('load', updateProgress);
+    </script>
+</body>
+</html>
