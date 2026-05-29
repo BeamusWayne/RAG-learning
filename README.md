@@ -2,6 +2,8 @@
 
 本项目为 **RAG（Retrieval-Augmented Generation，检索增强生成）** 的完整学习与实践仓库，覆盖从基础概念到生产级应用的完整技术栈，并包含多框架 Agent、图式工作流与实验性 RAG 改进（如 CRAG、GraphRAG、Agentic RAG）。
 
+> 🆕 **最新框架**: [Mastra 中文教程](https://github.com/BeamusWayne/Mastra-Tutorial) — TypeScript-first Agent 框架实战指南 · [在线阅读](https://beamuswayne.github.io/Mastra-Tutorial/)
+>
 > **新增**: [MultiLevelRAG](Projects/MultiLevelRAG/) — 意图路由 × 5 种 RAG 策略 × Streamlit 对比平台（MiniMax-M2.5 驱动）
 >
 > **新增文档**: [RAG 技术范式总览](RAG-Techniques/RAG范式总览.md) — 面向初学者梳理 Naive RAG、CRAG、GraphRAG、Agentic RAG、RAPTOR、HyDE、RAG-Fusion 等主流 RAG 范式。
@@ -27,6 +29,7 @@
   - [Agents（多模态）](#11-agents多模态-agent)
   - [Agno](#12-agno)
   - [Experiment（实验与场景）](#13-experiment实验与场景)
+- [关联项目](#关联项目)
 - [技术栈](#技术栈)
 - [安装与环境配置](#安装与环境配置)
 - [学习路径与快速开始](#学习路径与快速开始)
@@ -284,11 +287,36 @@ python 00_HelloAgno.py
 
 ---
 
+## 关联项目
+
+以下独立仓库与本学习项目互补，涉及本仓库未覆盖的框架或技术方向。
+
+### [Mastra 中文教程](https://github.com/BeamusWayne/Mastra-Tutorial) 🆕
+
+**TypeScript-first Agent 框架实战指南** — 不是官方文档翻译，而是按真实工程路径重写的学习指南：心智模型 → 可运行项目 → 结构化输出、Memory、RAG、MCP、多 Agent、Guardrails、评测、观测和部署。
+
+| 资源 | 链接 |
+|---|---|
+| 📖 在线阅读 | [beamuswayne.github.io/Mastra-Tutorial](https://beamuswayne.github.io/Mastra-Tutorial/) |
+| 📦 GitHub 仓库 | [BeamusWayne/Mastra-Tutorial](https://github.com/BeamusWayne/Mastra-Tutorial) |
+| 🧪 示例项目 | [travel-concierge](https://github.com/BeamusWayne/Mastra-Tutorial/tree/main/examples/travel-concierge) |
+
+**当前版本**: `@mastra/core@1.37.1` · `mastra@1.10.2` · `@mastra/memory@1.20.0` · `@mastra/mcp@1.8.1`
+
+**适合人群**:
+- 想从零开始理解 Mastra 的新人
+- 已有 LangChain / AI SDK 经验，想转 TypeScript-first 的开发者
+- 需要把 Agent 放进真实产品（不只是 demo）的工程师
+
+**内容结构**: `基础` → `实战（Agent / Tool / Workflow / Memory / RAG / MCP）` → `生产化（观测 / 评测 / Guardrails / 部署）`
+
+---
+
 ## 技术栈
 
 | 类别 | 技术 |
 |---|---|
-| **框架** | LangChain、LangGraph、PydanticAI、Pydantic Graph、Agno、LlamaIndex |
+| **框架** | LangChain、LangGraph、PydanticAI、Pydantic Graph、Agno、LlamaIndex、**Mastra** |
 | **LLM** | OpenAI（gpt-5.4）、Ollama（qwen3、qwen3-vl）、阿里云百炼（DashScope）、Google Gemini |
 | **Embedding** | DashScope `text-embedding-v1`、Ollama `qwen3-embedding:4b`、OpenAI `text-embedding-ada-002` |
 | **向量/存储** | Chroma、pgvector、InMemoryVectorStore、自建 NumPy 向量库 |
@@ -423,6 +451,7 @@ Experiment/*（实验项目）
 | PydanticAI | [ai.pydantic.dev](https://ai.pydantic.dev) |
 | Agno | [docs.agno.com](https://docs.agno.com) |
 | LlamaIndex | [docs.llamaindex.ai](https://docs.llamaindex.ai) |
+| Mastra | [mastra.ai](https://mastra.ai) |
 | OpenAI | [platform.openai.com/docs](https://platform.openai.com/docs) |
 | DashScope | [help.aliyun.com/zh/dashscope](https://help.aliyun.com/zh/dashscope) |
 
@@ -433,4 +462,4 @@ Experiment/*（实验项目）
 欢迎提交 Issue 与 Pull Request。本项目仅用于学习与研究。
 
 **作者**: Beamus Wayne  
-**最后更新**: 2026-04-29
+**最后更新**: 2026-05-29
